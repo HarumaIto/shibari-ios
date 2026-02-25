@@ -39,6 +39,15 @@ struct TimelinePostCard: View {
                 
                 Spacer()
                 
+                Text(statusDisplayName(for: post.status))
+                    .font(.caption2)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Color.gray.opacity(0.3)) // Androidの LightGray.copy(alpha = 0.3f) に相当
+                    .cornerRadius(4)
+                
                 // 自分以外の投稿ならケバブメニュー(︙)を表示
                 if post.userId != currentUserId {
                     Menu {
@@ -158,6 +167,17 @@ struct TimelinePostCard: View {
             )
             .presentationDetents([.medium, .large])
             .presentationDragIndicator(.visible)
+        }
+    }
+    
+    private func statusDisplayName(for status: PostStatus) -> String {
+        switch status {
+        case .pending:
+            return "審査中"
+        case .approved:
+            return "承認済"
+        case .rejected:
+            return "否認"
         }
     }
 }
