@@ -1,0 +1,64 @@
+import Foundation
+import FirebaseFirestore
+
+struct TimelinePostDto: Codable {
+    @DocumentID var id: String?
+    var userId: String
+    var questId: String
+    var groupId: String
+    
+    var author: AuthorSnapshotDto
+    var quest: QuestSnapshotDto
+    
+    var mediaUrl: String
+    var mediaType: String
+    var comment: String
+    
+    var approvalCount: Int
+    var votes: [String: String]
+    var status: String
+    
+    @ServerTimestamp var createdAt: Timestamp?
+    
+    func toDomain() -> TimelinePost {
+        return TimelinePost(
+            id: id ?? "",
+            userId: userId,
+            questId: questId,
+            groupId: groupId,
+            author: author.toDomain(),
+            quest: quest.toDomain(),
+            mediaUrl: mediaUrl,
+            // Enumの変換。失敗時は安全なデフォルト値を設定
+            mediaType: MediaType(rawValue: mediaType) ?? .image,
+            comment: comment,
+            approvalCount: approvalCount,
+            votes: votes.compactMapValues { VoteType(rawValue: $0) },
+            status: PostStatus(rawValue: status) ?? .pending,
+            // TimestampをDateに変換。nilの場合は現在時刻をフォールバック
+            createdAt: createdAt?.dateValue() ?? Date()
+        )
+    }
+    
+    static func fromDomain(_ domain: TimelinePost) -> TimelinePostDto {
+        return TimelinePostDto(
+            // Firestore側でIDを自動生成させる場合はnilを渡せるようにする
+            id: domain.id.isEmpty ? nil : domain.id,
+            userId: domain.userId,
+            questId: domain.questId,
+            groupId: domain.groupId,
+            author: AuthorSnapshotDto.fromDomain(domain.author),
+            quest: QuestSnapshotDto.fromDomain(domain.quest),
+            mediaUrl: domain.mediaUrl,
+            // EnumからString(rawValue)への変換
+            mediaType: domain.mediaType.rawValue,
+            comment: domain.comment,
+            approvalCount: domain.approvalCount,
+            // Dictionaryの中のEnumも一括で変換
+            votes: domain.votes.mapValues { $0.rawValue },
+            status: domain.status.rawValue,
+            // Date型をFirestore用のTimestamp型に変換
+            createdAt: Timestamp(date: domain.createdAt),
+        )
+    }
+}
