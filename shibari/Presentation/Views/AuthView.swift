@@ -101,7 +101,7 @@ struct AuthView: View {
                         
                         // Googleログインボタン（UIのみのモック）
                         Button(action: {
-                            // TODO: Google Sign-Inの実装
+                            Task { await viewModel.signInWithGoogle() }
                         }) {
                             HStack {
                                 Image(systemName: "g.circle.fill")

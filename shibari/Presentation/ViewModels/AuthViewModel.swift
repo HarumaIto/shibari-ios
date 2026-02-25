@@ -49,4 +49,19 @@ class AuthViewModel {
         }
         isLoading = false
     }
+    
+    func signInWithGoogle() async {
+        isLoading = true
+        errorMessage = nil
+        
+        do {
+            let userId = try await authRepository.signInWithGoogle()
+            self.currentUserId = userId
+            
+        } catch {
+            self.errorMessage = "Googleログインに失敗しました: \(error.localizedDescription)"
+        }
+        
+        isLoading = false
+    }
 }

@@ -9,6 +9,7 @@ import SwiftUI
 import FirebaseCore // Firebaseの初期化用
 import FirebaseMessaging 
 import UserNotifications
+import GoogleSignIn
 
 // Firebaseを初期化するためのデリゲート
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate, MessagingDelegate {
@@ -48,6 +49,9 @@ struct shibariApp: App {
             RootView()
                 .preferredColorScheme(.dark)
                 .tint(.tacticalRed)
+                .onOpenURL { url in
+                    GIDSignIn.sharedInstance.handle(url)
+                }
         }
     }
 }

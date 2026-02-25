@@ -5,7 +5,7 @@ protocol AuthRepository {
     func getCurrentUserId() -> String?
     func signIn(email: String, password: String) async throws -> String
     func signUp(email: String, password: String) async throws -> String
-    func signInWithGoogle(idToken: String, accessToken: String) async throws -> String
+    func signInWithGoogle() async throws -> String
     func signOut() throws
     func deleteAccount() async throws
     func getFCMToken() async throws -> String?
