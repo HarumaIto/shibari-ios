@@ -1,5 +1,6 @@
 import Foundation
 import Observation
+import GoogleSignIn
 
 @MainActor
 @Observable
@@ -55,9 +56,26 @@ class AuthViewModel {
         errorMessage = nil
         
         do {
-            let userId = try await authRepository.signInWithGoogle()
-            self.currentUserId = userId
+            guard let clientID = authRepository.getClientId() else {
+                throw NSError(domain: "AuthError", code: -1, userInfo: [NSLocalizedDescriptionKey: "FirebaseのクライアントIDが見つかりません。GoogleService-Info.plistを確認してください。"])
+            }
+                    
+            let config = GIDConfiguration(clientID: clientID)
+            GIDSignIn.sharedInstance.configuration = config
+                    
+            guard let rootVC = WindowHelper.getRootViewController() else {
+                throw NSError(domain: "AuthError", code: -1, userInfo: [NSLocalizedDescriptionKey: "画面の取得に失敗しました。"])
+            }
+                    
+            let signInResult = try await GIDSignIn.sharedInstance.signIn(withPresenting: rootVC)
+                    
+            guard let idToken = signInResult.user.idToken?.tokenString else {
+                throw NSError(domain: "AuthError", code: -1, userInfo: [NSLocalizedDescriptionKey: "IDトークンの取得に失敗しました。"])
+            }
+            let accessToken = signInResult.user.accessToken.tokenString
             
+            let userId = try await authRepository.signInWithGoogle(idToken: idToken, accessToken: accessToken)
+            self.currentUserId = userId
         } catch {
             self.errorMessage = "Googleログインに失敗しました: \(error.localizedDescription)"
         }
