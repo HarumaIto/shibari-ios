@@ -16,9 +16,9 @@
 	<key>UILaunchScreen</key>
 	<dict>
 		<key>UIColorName</key>
-		<string>LaunchBackground</string>
+		<string>SplashBackground</string>
 		<key>UIImageName</key>
-		<string>LaunchLogo</string>
+		<string>SplashLogo</string>
 	</dict>
 </dict>
 </plist>
