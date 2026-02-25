@@ -41,9 +41,7 @@ class AuthRepositoryImpl: AuthRepository {
         try? await messaging.token()
     }
     
-    @MainActor
     func signInWithGoogle(idToken: String, accessToken: String) async throws -> String {
-        // 6. Firebase AuthにGoogleのトークンを渡してログイン！
         let credential = GoogleAuthProvider.credential(withIDToken: idToken, accessToken: accessToken)
         let authResult = try await auth.signIn(with: credential)
         
