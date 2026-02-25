@@ -14,6 +14,8 @@ class AuthViewModel {
     var isLoading: Bool = false
     var errorMessage: String? = nil
     var currentUserId: String? = nil
+    var isAgreedToTerms: Bool = false
+
     
     init(authRepository: AuthRepository, userRepository: UserRepository) {
         self.authRepository = authRepository

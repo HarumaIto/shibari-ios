@@ -6,6 +6,7 @@ struct AuthView: View {
     
     var onNavigateToNext: () -> Void
     
+        
     var body: some View {
         ZStack {
             // 背景色を画面全体に敷く
@@ -63,6 +64,24 @@ struct AuthView: View {
                     
                     // --- ボタンエリア ---
                     VStack(spacing: 16) {
+                        HStack(alignment: .center, spacing: 8) {
+                            Button(action: {
+                                // タップでチェック状態を切り替え
+                                viewModel.isAgreedToTerms.toggle()
+                            }) {
+                                Image(systemName: viewModel.isAgreedToTerms ? "checkmark.square.fill" : "square")
+                                    .foregroundColor(viewModel.isAgreedToTerms ? .tacticalRed : .gray)
+                                    .font(.system(size: 20))
+                            }
+                            
+                            // Markdown形式でリンクを設定
+                            Text("[利用規約](\(termsUrl)) と [プライバシーポリシー](\(privacyUrl)) に同意する")
+                                .font(.footnote)
+                                .foregroundColor(.gray)
+                                .tint(.tacticalRed)
+                        }
+                        .padding(.bottom, 8)
+                        
                         // ログインボタン
                         Button(action: {
                             Task { await viewModel.signInWithEmail() }
@@ -93,7 +112,7 @@ struct AuthView: View {
                         .background(Color.slateSurfaceVariant)
                         .foregroundColor(.white)
                         .cornerRadius(12)
-                        .disabled(viewModel.isLoading || viewModel.email.isEmpty || viewModel.password.count < 6)
+                        .disabled(viewModel.isLoading || viewModel.email.isEmpty || viewModel.password.count < 6 || !viewModel.isAgreedToTerms)
                         
                         Divider()
                             .background(Color.slateSurfaceVariant)
@@ -118,7 +137,7 @@ struct AuthView: View {
                             RoundedRectangle(cornerRadius: 12)
                                 .stroke(Color.gray.opacity(0.3), lineWidth: 1)
                         )
-                        .disabled(viewModel.isLoading)
+                        .disabled(viewModel.isLoading || !viewModel.isAgreedToTerms)
                     }
                     .padding(.horizontal, 32)
                     
