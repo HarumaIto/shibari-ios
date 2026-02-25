@@ -7,7 +7,7 @@ struct ProfileView: View {
     @State private var showingLogoutAlert = false
     @State private var showingDeleteAlert = false
     @State private var showingEditProfile = false
-    
+
     var body: some View {
         ZStack {
             Color.slateBackground.ignoresSafeArea()
@@ -119,6 +119,17 @@ struct ProfileView: View {
                         }
                         
                         Spacer(minLength: 40)
+                        
+                        HStack(spacing: 16) {
+                            Link("利用規約", destination: URL(string: termsUrl)!)
+                            
+                            Text("|").foregroundColor(.slateSurfaceVariant)
+                            
+                            Link("プライバシーポリシー", destination:  URL(string: privacyUrl)!)
+                        }
+                        .font(.caption)
+                        .foregroundColor(.textSecondary)
+                        .padding(.bottom, 32)
                     }
                 }
                 .refreshable {
@@ -131,7 +142,6 @@ struct ProfileView: View {
         }
         .navigationTitle("プロフィール")
         .navigationBarTitleDisplayMode(.inline)
-        // ★ ヘッダー右上の「︙（ケバブメニュー）」
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Menu {
