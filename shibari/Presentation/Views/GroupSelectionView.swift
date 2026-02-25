@@ -32,6 +32,11 @@ struct GroupSelectionView: View {
                             .background(Color.slateSurface)
                             .cornerRadius(8)
                             .foregroundColor(.white)
+                        TextField("説明", text: $viewModel.newGroupDescription)
+                            .padding()
+                            .background(Color.slateSurface)
+                            .cornerRadius(8)
+                            .foregroundColor(.white)
                         
                         Button(action: {
                             Task { await viewModel.createGroup() }

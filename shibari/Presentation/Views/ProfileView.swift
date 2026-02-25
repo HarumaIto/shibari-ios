@@ -191,5 +191,15 @@ struct ProfileView: View {
                 )
             )
         }
+        .alert("エラー", isPresented: Binding<Bool>(
+            get: { viewModel.errorMessage != nil },
+            set: { _ in viewModel.errorMessage = nil }
+        )) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            if let errorMessage = viewModel.errorMessage {
+                Text(errorMessage)
+            }
+        }
     }
 }

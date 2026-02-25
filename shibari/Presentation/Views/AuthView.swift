@@ -99,9 +99,9 @@ struct AuthView: View {
                             .background(Color.slateSurfaceVariant)
                             .padding(.vertical, 8)
                         
-                        // Googleログインボタン（UIのみのモック）
+                        // Googleログインボタン
                         Button(action: {
-                            // TODO: Google Sign-Inの実装
+                            Task { await viewModel.signInWithGoogle() }
                         }) {
                             HStack {
                                 Image(systemName: "g.circle.fill")

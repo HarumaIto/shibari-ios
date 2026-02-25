@@ -2,6 +2,7 @@ import Foundation
 
 // MARK: - Auth Repository Protocol
 protocol AuthRepository {
+    func getClientId() -> String?
     func getCurrentUserId() -> String?
     func signIn(email: String, password: String) async throws -> String
     func signUp(email: String, password: String) async throws -> String

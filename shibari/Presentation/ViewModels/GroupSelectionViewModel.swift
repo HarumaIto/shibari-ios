@@ -14,6 +14,7 @@ class GroupSelectionViewModel {
     
     // --- 新規作成用 State ---
     var newGroupName: String = ""
+    var newGroupDescription: String = ""
     
     // --- 参加用 State ---
     var invitationCode: String = ""
@@ -32,7 +33,7 @@ class GroupSelectionViewModel {
         do {
             let groupId = try await groupRepository.createGroup(
                 name: newGroupName,
-                description: "",
+                description: newGroupDescription,
                 ownerId: currentUserId
             )
             // 自分のユーザー情報に groupId をセット
@@ -53,7 +54,12 @@ class GroupSelectionViewModel {
         
         do {
             let group = try await groupRepository.getGroupByInvitationCode(invitationCode: invitationCode)
-            let groupId = group!.id
+            guard let group = group else {
+                errorMessage = "グループが見つかりませんでした。"
+                isLoading = false
+                return
+            }
+            let groupId = group.id
             try await groupRepository.joinGroup(groupId: groupId, userId: currentUserId)
             // 自分のユーザー情報に groupId をセット
             try await userRepository.updateGroupId(userId: currentUserId, groupId: groupId)
