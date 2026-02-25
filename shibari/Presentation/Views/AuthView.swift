@@ -99,7 +99,7 @@ struct AuthView: View {
                             .background(Color.slateSurfaceVariant)
                             .padding(.vertical, 8)
                         
-                        // Googleログインボタン（UIのみのモック）
+                        // Googleログインボタン
                         Button(action: {
                             Task { await viewModel.signInWithGoogle() }
                         }) {
