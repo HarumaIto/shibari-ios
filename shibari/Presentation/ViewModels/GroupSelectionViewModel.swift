@@ -54,12 +54,12 @@ class GroupSelectionViewModel {
         
         do {
             let group = try await groupRepository.getGroupByInvitationCode(invitationCode: invitationCode)
-            if (group == nil) {
+            guard let group = group else {
                 errorMessage = "グループが見つかりませんでした。"
                 isLoading = false
                 return
             }
-            let groupId = group!.id
+            let groupId = group.id
             try await groupRepository.joinGroup(groupId: groupId, userId: currentUserId)
             // 自分のユーザー情報に groupId をセット
             try await userRepository.updateGroupId(userId: currentUserId, groupId: groupId)
