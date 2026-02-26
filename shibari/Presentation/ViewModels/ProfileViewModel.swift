@@ -25,13 +25,7 @@ class ProfileViewModel {
     }
     
     func loadData() async {
-        if currentUser != nil && currentGroup != nil {
-            return
-        }
-        
-        if currentUser == nil {
-            isLoading = true
-        }
+        isLoading = true
         do {
             guard let uid = authRepository.getCurrentUserId() else {
                 errorMessage = "ユーザー情報が取得できません"
