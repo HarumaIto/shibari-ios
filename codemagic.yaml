@@ -40,7 +40,7 @@ workflows:
           xcode-project use-profiles
       
       - name: Increment build number
-        scripts: |
+        script: |
           #!/bin/sh
           set -e
           set -x
