@@ -99,6 +99,7 @@ struct QuestSelectionView: View {
         // 保存成功時の画面遷移
         .onChange(of: viewModel.isCompleted) { _, newValue in
             if newValue {
+                viewModel.isCompleted = false
                 onNavigateToMain()
             }
         }

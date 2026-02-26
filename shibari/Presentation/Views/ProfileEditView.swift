@@ -57,7 +57,7 @@ struct ProfileEditView: View {
                     
                     // --- 2. 隊員名入力エリア ---
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("隊員名 (表示名)")
+                        Text("表示名 (ニックネーム)")
                             .foregroundColor(.textSecondary)
                             .font(.subheadline)
                         
