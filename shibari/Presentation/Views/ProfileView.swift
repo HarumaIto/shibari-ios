@@ -150,8 +150,8 @@ struct ProfileView: View {
                 }
             }
         }
-        .onAppear {
-            Task { await viewModel.loadData() }
+        .task {
+            await viewModel.loadData()
         }
         .navigationTitle("プロフィール")
         .navigationBarTitleDisplayMode(.inline)
