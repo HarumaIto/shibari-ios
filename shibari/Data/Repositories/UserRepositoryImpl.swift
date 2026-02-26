@@ -65,7 +65,8 @@ class UserRepositoryImpl: UserRepository {
         let updates: [String: Any] = [
             "isDeleted": true,
             "displayName": "退会済みユーザー",
-            "fcmToken": NSNull()
+            "fcmToken": NSNull(),
+            "photoUrl": NSNull()
         ]
         try await usersCollection.document(userId).updateData(updates)
     }
