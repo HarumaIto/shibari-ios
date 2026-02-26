@@ -49,7 +49,4 @@ workflows:
         
         submit_to_testflight: true
         
-        beta_build_options:
-          export_compliance: false
-          
         submit_to_app_store: false
