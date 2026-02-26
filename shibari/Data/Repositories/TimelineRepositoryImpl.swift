@@ -40,11 +40,24 @@ class TimelineRepositoryImpl: TimelineRepository {
     
     func createPost(post: TimelinePost, mediaData: Data) async throws {
         let postId = UUID().uuidString
-        let storageRef = storage.reference().child("posts/\(postId).jpg")
+        
+        let fileExtension: String
+        let mimeType: String
+        
+        switch post.mediaType {
+        case .video:
+            fileExtension = "mp4"
+            mimeType = "video/mp4"
+        case .image:
+            fileExtension = "jpg"
+            mimeType = "image/jpeg"
+        }
+        
+        let storageRef = storage.reference().child("posts/\(postId).\(fileExtension)")
         
         // 1. 画像をStorageにアップロード
         let metadata = StorageMetadata()
-        metadata.contentType = "image/jpeg"
+        metadata.contentType = "\(mimeType)/\(fileExtension)"
         let _ = try await storageRef.putDataAsync(mediaData, metadata: metadata)
         
         // 2. ダウンロードURLを取得
