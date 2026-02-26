@@ -214,12 +214,8 @@ struct ProfileView: View {
                 )
             )
         }
-        .onChange(of: showingEditProfile) { oldValue, newValue in
-            if newValue == false {
-                Task {
-                    await viewModel.loadData(forceReload: true)
-                }
-            }
+        .onChange(of: showingEditProfile) { _, newValue in
+            if newValue == false { reloadProfileIfNeeded() }
         }
         .navigationDestination(isPresented: $showingQuestsProfile) {
             QuestSelectionView(
@@ -234,12 +230,8 @@ struct ProfileView: View {
                 }
             )
         }
-        .onChange(of: showingQuestsProfile) { oldValue, newValue in
-            if newValue == false {
-                Task {
-                    await viewModel.loadData(forceReload: true)
-                }
-            }
+        .onChange(of: showingQuestsProfile) { _, newValue in
+            if newValue == false { reloadProfileIfNeeded() }
         }
         .alert("エラー", isPresented: Binding<Bool>(
             get: { viewModel.errorMessage != nil },
@@ -250,6 +242,12 @@ struct ProfileView: View {
             if let errorMessage = viewModel.errorMessage {
                 Text(errorMessage)
             }
+        }
+    }
+
+    private func reloadProfileIfNeeded() {
+        Task {
+            await viewModel.loadData(forceReload: true)
         }
     }
 }
