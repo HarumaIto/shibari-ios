@@ -24,7 +24,10 @@ class ProfileViewModel {
         self.questRepository = questRepository
     }
     
-    func loadData() async {
+    func loadData(forceReload: Bool = false) async {
+        if !forceReload, currentUser != nil {
+            return
+        }
         isLoading = true
         do {
             guard let uid = authRepository.getCurrentUserId() else {

@@ -98,7 +98,7 @@ struct ProfileView: View {
                                     .padding(.horizontal, 16)
                                 Spacer()
                                 Button {
-                                    showingQuestsProfiles = true
+                                    showingQuestsProfile = true
                                 } label: {
                                     Image(systemName: "pencil")
                                         .foregroundColor(.textSecondary)
@@ -217,7 +217,7 @@ struct ProfileView: View {
         .onChange(of: showingEditProfile) { oldValue, newValue in
             if newValue == false {
                 Task {
-                    await viewModel.loadData()
+                    await viewModel.loadData(forceReload: true)
                 }
             }
         }
@@ -237,7 +237,7 @@ struct ProfileView: View {
         .onChange(of: showingQuestsProfile) { oldValue, newValue in
             if newValue == false {
                 Task {
-                    await viewModel.loadData()
+                    await viewModel.loadData(forceReload: true)
                 }
             }
         }
