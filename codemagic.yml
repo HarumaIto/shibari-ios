@@ -1,0 +1,55 @@
+workflows:
+  ios-release-workflow:
+    name: iOS Release (TestFlight)
+    # M1/M2 Macのビルドマシンを使用（ビルドが高速です）
+    instance_type: mac_mini_m2
+    
+    environment:
+      # 自動コード署名（CodemagicのUI側で連携設定が必要です）
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.betsudotai.shibari
+      
+      vars:
+        APP_STORE_APP_ID: "6759665718"
+        
+      xcode: 26.0.1
+      cocoapods: default
+
+    scripts:
+      - name: Set up keychain to be used for code signing
+        script: |
+          keychain initialize
+
+      - name: Fetch signing files
+        script: |
+          app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create
+
+      - name: Add certificates to keychain
+        script: |
+          keychain add-certificates
+
+      - name: Set up code signing settings on Xcode project
+        script: |
+          xcode-project use-profiles
+
+      - name: Build IPA for distribution
+        script: |
+          xcode-project build-ipa \
+            --project "shibari.xcodeproj" \
+            --scheme "shibari"
+
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+
+    publishing:
+      app_store_connect:
+        auth: integration
+        
+        submit_to_testflight: true
+        
+        beta_build_options:
+          export_compliance: false
+          
+        submit_to_app_store: false
