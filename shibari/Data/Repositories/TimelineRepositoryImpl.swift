@@ -57,7 +57,7 @@ class TimelineRepositoryImpl: TimelineRepository {
         
         // 1. 画像をStorageにアップロード
         let metadata = StorageMetadata()
-        metadata.contentType = "\(mimeType)/\(fileExtension)"
+        metadata.contentType = mimeType
         let _ = try await storageRef.putDataAsync(mediaData, metadata: metadata)
         
         // 2. ダウンロードURLを取得
