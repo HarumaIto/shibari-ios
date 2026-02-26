@@ -8,6 +8,8 @@ struct PostView: View {
     @Environment(\.dismiss) private var dismiss
     
     @State private var videoPlayer: AVPlayer?
+    @State private var tempVideoURL: URL?
+    @State private var videoWriteTask: Task<Void, Never>?
 
     var body: some View {
         ZStack {
@@ -82,6 +84,16 @@ struct PostView: View {
         .onChange(of: viewModel.isCompleted) { _, isCompleted in
             if isCompleted { dismiss() }
         }
+        .onDisappear {
+            videoWriteTask?.cancel()
+            videoWriteTask = nil
+            videoPlayer?.pause()
+            videoPlayer = nil
+            if let url = tempVideoURL {
+                try? FileManager.default.removeItem(at: url)
+                tempVideoURL = nil
+            }
+        }
         .alert("エラー", isPresented: Binding<Bool>(
             get: { viewModel.errorMessage != nil },
             set: { _ in viewModel.errorMessage = nil }
@@ -132,17 +144,39 @@ struct PostView: View {
     }
     
     // MARK: - Methods
+    @MainActor
     private func handleMediaChange(newData: Data?) {
         videoPlayer?.pause()
         videoPlayer = nil
         
+        // Cancel any in-flight write before starting a new one
+        videoWriteTask?.cancel()
+        videoWriteTask = nil
+        
+        // Clean up previous temp file before creating a new one
+        if let oldURL = tempVideoURL {
+            try? FileManager.default.removeItem(at: oldURL)
+            tempVideoURL = nil
+        }
+        
         if viewModel.isSelectedMediaVideo, let data = newData {
-            let tempFileURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + ".mp4")
-            do {
-                try data.write(to: tempFileURL)
-                videoPlayer = AVPlayer(url: tempFileURL)
-            } catch {
-                viewModel.errorMessage = "動画のプレビューに失敗しました"
+            videoWriteTask = Task {
+                let tempFileURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + ".mp4")
+                do {
+                    try await Task.detached(priority: .utility) {
+                        try data.write(to: tempFileURL)
+                    }.value
+                    guard !Task.isCancelled else {
+                        try? FileManager.default.removeItem(at: tempFileURL)
+                        return
+                    }
+                    tempVideoURL = tempFileURL
+                    videoPlayer = AVPlayer(url: tempFileURL)
+                } catch {
+                    if !Task.isCancelled {
+                        viewModel.errorMessage = "動画のプレビューに失敗しました"
+                    }
+                }
             }
         }
     }
