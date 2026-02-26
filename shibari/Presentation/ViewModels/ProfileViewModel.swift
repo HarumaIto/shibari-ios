@@ -68,8 +68,12 @@ class ProfileViewModel {
     // 退会処理（データ匿名化 ＋ アカウント削除）
     func deleteAccount() async {
         isLoading = true
+        defer { isLoading = false }
         do {
-            guard let uid = authRepository.getCurrentUserId() else { return }
+            guard let uid = authRepository.getCurrentUserId() else {
+                isLoading = false
+                return
+            }
             
             // 過去の投稿がエラーにならないよう、名前等を「退会済みユーザー」に書き換える（匿名化）
             try await userRepository.anonymizeUser(userId: uid)
@@ -80,7 +84,6 @@ class ProfileViewModel {
             isLoggedOut = true
         } catch {
             errorMessage = "退会処理に失敗しました。再度ログインし直してからお試しください。"
-            isLoading = false
         }
     }
 }
