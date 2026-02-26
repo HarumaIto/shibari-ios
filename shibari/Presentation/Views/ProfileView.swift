@@ -7,7 +7,7 @@ struct ProfileView: View {
     @State private var showingLogoutAlert = false
     @State private var showingDeleteAlert = false
     @State private var showingEditProfile = false
-    @State private var showingQuestsProfiles = false
+    @State private var showingQuestsProfile = false
 
     var body: some View {
         ZStack {
@@ -98,7 +98,7 @@ struct ProfileView: View {
                                     .padding(.horizontal, 16)
                                 Spacer()
                                 Button {
-                                    showingQuestsProfiles = true
+                                    showingQuestsProfile = true
                                 } label: {
                                     Image(systemName: "pencil")
                                         .foregroundColor(.textSecondary)
@@ -150,8 +150,8 @@ struct ProfileView: View {
                 }
             }
         }
-        .onAppear {
-            Task { await viewModel.loadData() }
+        .task {
+            await viewModel.loadData()
         }
         .navigationTitle("プロフィール")
         .navigationBarTitleDisplayMode(.inline)
@@ -217,7 +217,7 @@ struct ProfileView: View {
         .onChange(of: showingEditProfile) { _, newValue in
             if newValue == false { reloadProfileIfNeeded() }
         }
-        .navigationDestination(isPresented: $showingQuestsProfiles) {
+        .navigationDestination(isPresented: $showingQuestsProfile) {
             QuestSelectionView(
                 viewModel: QuestSelectionViewModel(
                     questRepository: QuestRepositoryImpl(),
@@ -226,11 +226,11 @@ struct ProfileView: View {
                     currentUserId: viewModel.currentUser?.id ?? ""
                 ),
                 onNavigateToMain: {
-                    showingQuestsProfiles = false
+                    showingQuestsProfile = false
                 }
             )
         }
-        .onChange(of: showingQuestsProfiles) { _, newValue in
+        .onChange(of: showingQuestsProfile) { _, newValue in
             if newValue == false { reloadProfileIfNeeded() }
         }
         .alert("エラー", isPresented: Binding<Bool>(
@@ -247,7 +247,7 @@ struct ProfileView: View {
 
     private func reloadProfileIfNeeded() {
         Task {
-            await viewModel.loadData()
+            await viewModel.loadData(forceReload: true)
         }
     }
 }
