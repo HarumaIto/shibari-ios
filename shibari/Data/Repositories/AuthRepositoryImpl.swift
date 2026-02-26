@@ -30,13 +30,6 @@ class AuthRepositoryImpl: AuthRepository {
         try auth.signOut()
     }
     
-    func deleteAccount() async throws {
-        guard let user = auth.currentUser else {
-            throw NSError(domain: "AuthError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Not logged in"])
-        }
-        try await user.delete()
-    }
-    
     func getFCMToken() async throws -> String? {
         try? await messaging.token()
     }
