@@ -7,7 +7,7 @@ struct ProfileView: View {
     @State private var showingLogoutAlert = false
     @State private var showingDeleteAlert = false
     @State private var showingEditProfile = false
-    @State private var showingQuestsProfiles = false
+    @State private var showingQuestsProfile = false
 
     var body: some View {
         ZStack {
@@ -221,7 +221,7 @@ struct ProfileView: View {
                 }
             }
         }
-        .navigationDestination(isPresented: $showingQuestsProfiles) {
+        .navigationDestination(isPresented: $showingQuestsProfile) {
             QuestSelectionView(
                 viewModel: QuestSelectionViewModel(
                     questRepository: QuestRepositoryImpl(),
@@ -230,11 +230,11 @@ struct ProfileView: View {
                     currentUserId: viewModel.currentUser?.id ?? ""
                 ),
                 onNavigateToMain: {
-                    showingQuestsProfiles = false
+                    showingQuestsProfile = false
                 }
             )
         }
-        .onChange(of: showingQuestsProfiles) { oldValue, newValue in
+        .onChange(of: showingQuestsProfile) { oldValue, newValue in
             if newValue == false {
                 Task {
                     await viewModel.loadData()
