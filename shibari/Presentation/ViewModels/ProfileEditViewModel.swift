@@ -59,10 +59,12 @@ class ProfileEditViewModel {
                     } else {
                         errorMessage = "画像の処理に失敗しました"
                         selectedItem = nil
+                        selectedImageData = nil
                     }
                 } else {
                     errorMessage = "対応していない画像フォーマットです。"
                     selectedItem = nil
+                    selectedImageData = nil
                 }
             }
         } catch {
