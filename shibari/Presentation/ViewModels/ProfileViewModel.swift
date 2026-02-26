@@ -24,14 +24,11 @@ class ProfileViewModel {
         self.questRepository = questRepository
     }
     
-    func loadData() async {
-        if currentUser != nil && currentGroup != nil {
+    func loadData(forceReload: Bool = false) async {
+        if !forceReload, currentUser != nil {
             return
         }
-        
-        if currentUser == nil {
-            isLoading = true
-        }
+        isLoading = true
         do {
             guard let uid = authRepository.getCurrentUserId() else {
                 errorMessage = "ユーザー情報が取得できません"
