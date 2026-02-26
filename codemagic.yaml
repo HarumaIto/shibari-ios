@@ -4,7 +4,8 @@ workflows:
     # M1/M2 Macのビルドマシンを使用（ビルドが高速です）
     instance_type: mac_mini_m2
 
-    integrations: "Codemagic API key"
+    integrations: 
+      app_store_connect: "Codemagic API key"
     
     environment:
       # 自動コード署名（CodemagicのUI側で連携設定が必要です）
