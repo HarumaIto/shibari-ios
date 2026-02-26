@@ -74,8 +74,8 @@ class ProfileViewModel {
             // 過去の投稿がエラーにならないよう、名前等を「退会済みユーザー」に書き換える（匿名化）
             try await userRepository.anonymizeUser(userId: uid)
             
-            // Firebase Authからユーザーを完全に削除
-            try await authRepository.deleteAccount()
+            // サーバー側でアカウントを削除するのでログアウト
+            try authRepository.signOut()
             
             isLoggedOut = true
         } catch {
