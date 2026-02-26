@@ -1,7 +1,13 @@
 workflows:
   ios-release-workflow:
     name: iOS Release (TestFlight)
-    # M1/M2 Macのビルドマシンを使用（ビルドが高速です）
+
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: 'main'
+
     instance_type: mac_mini_m2
 
     integrations: 
