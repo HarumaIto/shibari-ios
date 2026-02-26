@@ -7,6 +7,7 @@ struct ProfileView: View {
     @State private var showingLogoutAlert = false
     @State private var showingDeleteAlert = false
     @State private var showingEditProfile = false
+    @State private var showingQuestsProfiles = false
 
     var body: some View {
         ZStack {
@@ -90,10 +91,22 @@ struct ProfileView: View {
                         }
                         
                         VStack(alignment: .leading, spacing: 12) {
-                            Text("参加中の縛り")
-                                .font(.headline)
-                                .foregroundColor(.textSecondary)
-                                .padding(.horizontal, 16)
+                            HStack {
+                                Text("参加中の縛り")
+                                    .font(.headline)
+                                    .foregroundColor(.textSecondary)
+                                    .padding(.horizontal, 16)
+                                Spacer()
+                                Button {
+                                    showingQuestsProfiles = true
+                                } label: {
+                                    Image(systemName: "pencil")
+                                        .foregroundColor(.textSecondary)
+                                        .padding(.horizontal, 8)
+                                        .padding(.vertical, 16)
+                                }
+                            }
+                            
                             
                             if viewModel.participatingQuests.isEmpty {
                                 Text("現在参加している縛りはありません。")
@@ -137,8 +150,8 @@ struct ProfileView: View {
                 }
             }
         }
-        .task {
-            await viewModel.loadData()
+        .onAppear {
+            Task { await viewModel.loadData() }
         }
         .navigationTitle("プロフィール")
         .navigationBarTitleDisplayMode(.inline)
@@ -200,6 +213,33 @@ struct ProfileView: View {
                     currentUserId: viewModel.currentUser?.id ?? ""
                 )
             )
+        }
+        .onChange(of: showingEditProfile) { oldValue, newValue in
+            if newValue == false {
+                Task {
+                    await viewModel.loadData()
+                }
+            }
+        }
+        .navigationDestination(isPresented: $showingQuestsProfiles) {
+            QuestSelectionView(
+                viewModel: QuestSelectionViewModel(
+                    questRepository: QuestRepositoryImpl(),
+                    userRepository: UserRepositoryImpl(),
+                    groupId: viewModel.currentGroup?.id ?? "",
+                    currentUserId: viewModel.currentUser?.id ?? ""
+                ),
+                onNavigateToMain: {
+                    showingQuestsProfiles = false
+                }
+            )
+        }
+        .onChange(of: showingQuestsProfiles) { oldValue, newValue in
+            if newValue == false {
+                Task {
+                    await viewModel.loadData()
+                }
+            }
         }
         .alert("エラー", isPresented: Binding<Bool>(
             get: { viewModel.errorMessage != nil },
