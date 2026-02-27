@@ -8,6 +8,7 @@ struct ProfileView: View {
     @State private var showingDeleteAlert = false
     @State private var showingEditProfile = false
     @State private var showingQuestsProfile = false
+    @State private var isCopied = false
 
     var body: some View {
         ZStack {
@@ -78,9 +79,24 @@ struct ProfileView: View {
                                             .foregroundColor(.textSecondary)
                                         Spacer()
                                         Text(group.invitationCode)
+                                        .textSelection(.enabled)
                                             .font(.system(.body, design: .monospaced))
                                             .fontWeight(.bold)
                                             .foregroundColor(.achievementGold)
+                                        Button(action: {
+                                            UIPasteboard.general.string = group.invitationCode
+                                            withAnimation {
+                                                isCopied = true
+                                            }
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                                withAnimation {
+                                                    isCopied = false
+                                                }
+                                            }
+                                        }) {
+                                            Image(systemName: isCopied ? "checkmark" : "doc.on.doc")
+                                                .foregroundColor(.textSecondary)
+                                        }
                                     }
                                 }
                                 .padding(16)
@@ -250,4 +266,16 @@ struct ProfileView: View {
             await viewModel.loadData(forceReload: true)
         }
     }
+}
+
+#Preview {
+    ProfileView(
+        viewModel: ProfileViewModel(
+            authRepository: AuthRepositoryMock(),
+            userRepository: UserRepositoryMock(),
+            groupRepository: GroupRepositoryMock(),
+            questRepository: QuestRepositoryMock()
+        ),
+        onLogout: {}
+    )
 }

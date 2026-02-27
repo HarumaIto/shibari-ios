@@ -8,4 +8,5 @@ struct Quest: Identifiable, Equatable {
     let frequency: QuestFrequency
     let description: String
     let threshold: Int?
+    var isCompleted: Bool = false
 }

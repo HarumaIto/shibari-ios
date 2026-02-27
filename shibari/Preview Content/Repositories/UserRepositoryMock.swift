@@ -2,9 +2,16 @@ import Foundation
 
 class UserRepositoryMock: UserRepository {
     func getUser(userId: String) async throws -> User? {
-        // プレビューでユーザー情報を表示したい場合は、ここにダミーのUserインスタンスを返します
-        // 例: return User(id: userId, name: "テストユーザー", ...)
-        return nil
+        return User(
+            id: "mock_user_id_123",
+            displayName: "Mock user",
+            participatingQuestIds: [
+                "mock_quest_id_123",
+                "mock_quest_id_456"
+            ],
+            groupId: "mock_group_id_456",
+            blockedUserIds: []
+        )
     }
     
     func createUser(user: User) async throws { }

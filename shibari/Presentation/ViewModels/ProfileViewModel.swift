@@ -45,7 +45,7 @@ class ProfileViewModel {
                     self.currentGroup = try await groupRepository.getGroup(groupId: groupId)
                     
                     // 3. 参加中のクエストを取得
-                    let allQuests = try await questRepository.getQuests(groupId: groupId)
+                    let allQuests = try await questRepository.getGroupQuests(groupId: groupId)
                     self.participatingQuests = allQuests.filter { user.participatingQuestIds.contains($0.id) }
                 }
             }

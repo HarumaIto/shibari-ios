@@ -59,7 +59,7 @@ class QuestsViewModel {
             }
             
             // 全てのクエストを取得し、自分の参加中IDでフィルタリング
-            let allQuests = try await questRepository.getQuests(groupId: groupId)
+            let allQuests = try await questRepository.getMyQuests(groupId: groupId, user: user)
             let myQuests = allQuests.filter { questIds.contains($0.id) }
                         
             let groupedDict = Dictionary(grouping: myQuests, by: { $0.frequency })
