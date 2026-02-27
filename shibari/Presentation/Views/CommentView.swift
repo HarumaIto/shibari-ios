@@ -7,7 +7,7 @@ struct CommentView: View {
     var body: some View {
         VStack(spacing: 0) {
             // ヘッダー
-            Text("通信記録（コメント）")
+            Text("コメント")
                 .font(.headline)
                 .foregroundColor(.white)
                 .padding()
@@ -21,7 +21,7 @@ struct CommentView: View {
                 Spacer()
             } else if viewModel.comments.isEmpty {
                 Spacer()
-                Text("まだ通信記録はありません")
+                Text("まだコメントはありません")
                     .foregroundColor(.textSecondary)
                 Spacer()
             } else {
@@ -30,11 +30,16 @@ struct CommentView: View {
                         LazyVStack(alignment: .leading, spacing: 16) {
                             ForEach(viewModel.comments) { comment in
                                 HStack(alignment: .top, spacing: 12) {
-                                    // アイコン
-                                    Circle()
-                                        .fill(Color.slateSurfaceVariant)
-                                        .frame(width: 36, height: 36)
-                                        .overlay(Text(String(comment.author.displayName.prefix(1))).foregroundColor(.white).font(.caption))
+                                    if let photoUrl = comment.author.photoUrl, let url = URL(string: photoUrl) {
+                                        FeedImageView(url: url)
+                                            .frame(width: 36, height: 36)
+                                            .clipShape(Circle())
+                                    } else {
+                                        FallbackIcon(
+                                            name: comment.author.displayName,
+                                            size: 40
+                                        )
+                                    }
                                     
                                     VStack(alignment: .leading, spacing: 4) {
                                         HStack {
