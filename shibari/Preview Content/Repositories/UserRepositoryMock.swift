@@ -6,7 +6,8 @@ class UserRepositoryMock: UserRepository {
             id: "mock_user_id_123",
             displayName: "Mock user",
             participatingQuestIds: [
-                "mock_quest_id_123"
+                "mock_quest_id_123",
+                "mock_quest_id_456"
             ],
             groupId: "mock_group_id_456",
             blockedUserIds: []
