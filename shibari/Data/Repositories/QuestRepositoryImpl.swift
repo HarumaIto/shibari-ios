@@ -16,7 +16,7 @@ class QuestRepositoryImpl: QuestRepository {
     func getMyQuests(groupId: String, user: User) async throws -> [Quest] {
         guard !user.participatingQuestIds.isEmpty else { return [] }
         
-        var questDtos: [QuestDto] = []
+        var quests: [Quest] = []
         
         let ids = user.participatingQuestIds
         for i in stride(from: 0, to: ids.count, by: 10) {
@@ -24,35 +24,61 @@ class QuestRepositoryImpl: QuestRepository {
             
             let snapshot = try await db.collection("quests")
                 .whereField("groupId", isEqualTo: groupId)
-                .whereField("id", in: chunk)
+                .whereField(FieldPath.documentID(), in: chunk)
                 .getDocuments()
             
             let dtos = snapshot.documents.compactMap{ try? $0.data(as: QuestDto.self) }
-            questDtos.append(contentsOf: dtos)
+            quests.append(contentsOf: dtos.map { $0.toDomain() })
         }
         
         let calendar = Calendar.current
         let now = Date()
         guard let startOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: .now)) else { return [] }
         
+        
+        // Determine the minimal required start date based on quest frequencies
+        let frequencies = Set(quests.map { $0.frequency })
+        var candidateStartDates: [Date] = []
+                
+        // Daily quests only need posts from the start of today
+        let startOfDay = calendar.startOfDay(for: now)
+        if frequencies.contains(.DAILY) {
+            candidateStartDates.append(startOfDay)
+        }
+                
+        // Weekly quests need posts from the start of the current week (may cross month boundary)
+        if frequencies.contains(.WEEKLY),
+            let weekInterval = calendar.dateInterval(of: .weekOfYear, for: now) {
+            candidateStartDates.append(weekInterval.start)
+        }
+                
+        // Monthly quests need posts from the start of the current month
+        if frequencies.contains(.MONTHLY),
+            let startOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: now)) {
+            candidateStartDates.append(startOfMonth)
+        }
+                
+        // Use the earliest required start date; fall back to start of today if none found
+        let queryStartDate = candidateStartDates.min() ?? startOfDay
+        
         let postsSnapshot = try await db.collection("timelines")
             .whereField("userId", isEqualTo: user.id)
-            .whereField("createdAt", isGreaterThanOrEqualTo:  startOfMonth)
+            .whereField("createdAt", isGreaterThanOrEqualTo:  queryStartDate)
             .getDocuments()
         
         let recentPosts = postsSnapshot.documents.compactMap { try? $0.data(as: TimelinePostDto.self) }
+        let postsByQuestId = Dictionary(grouping: recentPosts, by: { $0.questId })
         
-        let quests: [Quest] = questDtos.map { dto in
-            var quest = dto.toDomain()
-            
-            let postsForThisQuest = recentPosts.filter { $0.questId == quest.id }
+        return quests.map { quest in
+            var updatedQuest = quest
+            let postsForThisQuest = postsByQuestId[quest.id] ?? []
             
             if postsForThisQuest.isEmpty {
-                quest.isCompleted = false
+                updatedQuest.isCompleted = false
                 return quest
             }
             
-            quest.isCompleted = postsForThisQuest.contains { post in
+            updatedQuest.isCompleted = postsForThisQuest.contains { post in
                 guard let postDate = post.createdAt?.dateValue() else { return false }
                 
                 switch quest.frequency {
@@ -66,9 +92,8 @@ class QuestRepositoryImpl: QuestRepository {
                     return false
                 }
             }
-            return quest
+            return updatedQuest
         }
-        return quests
     }
     
     func createQuest(quest: Quest) async throws {
