@@ -57,6 +57,11 @@ class QuestRepositoryImpl: QuestRepository {
             let startOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: now)) {
             candidateStartDates.append(startOfMonth)
         }
+        
+        if frequencies.contains(.YEARLY),
+            let startOfYear = calendar.date(from: calendar.dateComponents([.year], from: now)) {
+            candidateStartDates.append(startOfYear)
+        }
                 
         // Use the earliest required start date; fall back to start of today if none found
         let queryStartDate = candidateStartDates.min() ?? startOfDay
@@ -88,6 +93,8 @@ class QuestRepositoryImpl: QuestRepository {
                     return calendar.isDate(postDate, equalTo: now, toGranularity: .weekOfYear)
                 case .MONTHLY:
                     return calendar.isDate(postDate, equalTo: now, toGranularity: .month)
+                case .YEARLY:
+                    return calendar.isDate(postDate, equalTo: now, toGranularity: .year)
                 default:
                     return false
                 }
