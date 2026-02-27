@@ -30,19 +30,23 @@ class AuthRepositoryImpl: AuthRepository {
         try auth.signOut()
     }
     
-    func deleteAccount() async throws {
-        guard let user = auth.currentUser else {
-            throw NSError(domain: "AuthError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Not logged in"])
-        }
-        try await user.delete()
-    }
-    
     func getFCMToken() async throws -> String? {
         try? await messaging.token()
     }
     
     func signInWithGoogle(idToken: String, accessToken: String) async throws -> String {
         let credential = GoogleAuthProvider.credential(withIDToken: idToken, accessToken: accessToken)
+        let authResult = try await auth.signIn(with: credential)
+        
+        return authResult.user.uid
+    }
+    
+    func signInWithApple(idToken: String, nonce: String, fullName: PersonNameComponents?) async throws -> String {
+        let credential = OAuthProvider.appleCredential(
+            withIDToken: idToken,
+            rawNonce: nonce,
+            fullName: fullName
+        )
         let authResult = try await auth.signIn(with: credential)
         
         return authResult.user.uid

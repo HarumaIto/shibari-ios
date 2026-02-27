@@ -63,9 +63,10 @@ class UserRepositoryImpl: UserRepository {
     
     func anonymizeUser(userId: String) async throws {
         let updates: [String: Any] = [
+            "isDeleted": true,
             "displayName": "退会済みユーザー",
-            "photoUrl": NSNull(),
-            "fcmToken": NSNull()
+            "fcmToken": NSNull(),
+            "photoUrl": NSNull()
         ]
         try await usersCollection.document(userId).updateData(updates)
     }

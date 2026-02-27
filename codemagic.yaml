@@ -1,0 +1,61 @@
+workflows:
+  ios-release-workflow:
+    name: iOS Release (TestFlight)
+
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: 'main'
+
+    instance_type: mac_mini_m2
+
+    integrations: 
+      app_store_connect: "Codemagic API key"
+    
+    environment:
+      ios_signing:
+        provisioning_profiles:
+          - codemagic_store_profile
+        certificates:
+          - codemagic_signing_certificate
+      
+      groups:
+        - ios_deploy
+
+      xcode: 26.0.1
+
+    scripts:
+      - name: Set up code signing settings on Xcode project
+        script: |
+          xcode-project use-profiles
+      
+      - name: Set up GoogleService-Info.plist
+        script: |
+          echo $GOOGLE_SERVICE_INFO_PLIST | base64 --decode > $CM_BUILD_DIR/shibari/GoogleService-Info.plist
+
+      - name: Increment build number
+        script: |
+          #!/bin/sh
+          set -e
+          set -x
+          cd $CM_BUILD_DIR
+          agvtool new-version -all $(($BUILD_NUMBER + 1))
+
+      - name: Build IPA for distribution
+        script: |
+          xcode-project build-ipa \
+            --project "shibari.xcodeproj" \
+            --scheme "shibari"
+
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+
+    publishing:
+      app_store_connect:
+        auth: integration
+        
+        submit_to_testflight: true
+        
+        submit_to_app_store: false

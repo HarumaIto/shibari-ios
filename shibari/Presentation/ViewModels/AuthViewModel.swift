@@ -1,6 +1,9 @@
 import Foundation
 import Observation
 import GoogleSignIn
+import AuthenticationServices
+import CryptoKit
+import Security
 
 @MainActor
 @Observable
@@ -15,7 +18,7 @@ class AuthViewModel {
     var errorMessage: String? = nil
     var currentUserId: String? = nil
     var isAgreedToTerms: Bool = false
-
+    var currentNonce: String? = nil
     
     init(authRepository: AuthRepository, userRepository: UserRepository) {
         self.authRepository = authRepository
@@ -83,5 +86,82 @@ class AuthViewModel {
         }
         
         isLoading = false
+    }
+    
+    func handleSignInWithAppleRequest(_ request: ASAuthorizationAppleIDRequest) {
+        let nonce = randomNonceString()
+        currentNonce = nonce
+        request.requestedScopes = [.fullName, .email]
+        request.nonce = sha256(nonce)
+    }
+        
+    func handleSignInWithAppleCompletion(_ result: Result<ASAuthorization, Error>) async {
+        isLoading = true
+        errorMessage = nil
+        defer { isLoading = false }
+        
+        switch result {
+        case .success(let authorization):
+            if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential {
+                guard let nonce = currentNonce else {
+                    errorMessage = "Nonceが見つかりません。"
+                    return
+                }
+                guard let appleIDToken = appleIDCredential.identityToken,
+                      let idTokenString = String(data: appleIDToken, encoding: .utf8) else {
+                    errorMessage = "Apple ID トークンの取得に失敗しました。"
+                    return
+                }
+                do {
+                    let userId = try await authRepository.signInWithApple(
+                        idToken: idTokenString,
+                        nonce: nonce,
+                        fullName: appleIDCredential.fullName
+                    )
+                    currentUserId = userId
+                } catch {
+                    errorMessage = error.localizedDescription
+                }
+            } else {
+                errorMessage = "予期せぬ認証情報が返されました。"
+            }
+            
+        case .failure(let error):
+            // ユーザーが意図的にキャンセルした場合はエラーを表示しない（UX向上）
+            if let asError = error as? ASAuthorizationError, asError.code == .canceled {
+                return
+            }
+            errorMessage = error.localizedDescription
+        }
+    }
+    
+    private func randomNonceString(length: Int = 32) -> String {
+        precondition(length > 0)
+        var randomBytes = [UInt8](repeating: 0, count: length)
+        let errorCode = SecRandomCopyBytes(kSecRandomDefault, randomBytes.count, &randomBytes)
+        if errorCode != errSecSuccess {
+            errorMessage = "Unable to generate nonce. SecRandomCopyBytes failed with OSStatus \(errorCode)"
+            return ""
+        }
+        
+        let charset: [Character] =
+        Array("0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._")
+        
+        let nonce = randomBytes.map { byte in
+            // Pick a random character from the set, wrapping around if needed.
+            charset[Int(byte) % charset.count]
+        }
+        
+        return String(nonce)
+    }
+    
+    private func sha256(_ input: String) -> String {
+        let inputData = Data(input.utf8)
+        let hashedData = SHA256.hash(data: inputData)
+        let hashString = hashedData.compactMap {
+            String(format: "%02x", $0)
+        }.joined()
+        
+        return hashString
     }
 }

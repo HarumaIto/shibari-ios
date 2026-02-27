@@ -21,6 +21,10 @@ class QuestSelectionViewModel {
         self.groupId = groupId
         self.currentUserId = currentUserId
         
+        if (currentUserId.isEmpty) {
+            return
+        }
+        
         Task { await loadQuests() }
     }
     
@@ -52,7 +56,7 @@ class QuestSelectionViewModel {
             isCompleted = true
         } catch {
             self.errorMessage = "保存に失敗しました"
-            isLoading = false
         }
+        isLoading = false
     }
 }

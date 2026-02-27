@@ -24,14 +24,11 @@ class ProfileViewModel {
         self.questRepository = questRepository
     }
     
-    func loadData() async {
-        if currentUser != nil && currentGroup != nil {
+    func loadData(forceReload: Bool = false) async {
+        if !forceReload, currentUser != nil {
             return
         }
-        
-        if currentUser == nil {
-            isLoading = true
-        }
+        isLoading = true
         do {
             guard let uid = authRepository.getCurrentUserId() else {
                 errorMessage = "ユーザー情報が取得できません"
@@ -71,19 +68,22 @@ class ProfileViewModel {
     // 退会処理（データ匿名化 ＋ アカウント削除）
     func deleteAccount() async {
         isLoading = true
+        defer { isLoading = false }
         do {
-            guard let uid = authRepository.getCurrentUserId() else { return }
+            guard let uid = authRepository.getCurrentUserId() else {
+                isLoading = false
+                return
+            }
             
             // 過去の投稿がエラーにならないよう、名前等を「退会済みユーザー」に書き換える（匿名化）
             try await userRepository.anonymizeUser(userId: uid)
             
-            // Firebase Authからユーザーを完全に削除
-            try await authRepository.deleteAccount()
+            // サーバー側でアカウントを削除するのでログアウト
+            try authRepository.signOut()
             
             isLoggedOut = true
         } catch {
             errorMessage = "退会処理に失敗しました。再度ログインし直してからお試しください。"
-            isLoading = false
         }
     }
 }

@@ -7,8 +7,8 @@ protocol AuthRepository {
     func signIn(email: String, password: String) async throws -> String
     func signUp(email: String, password: String) async throws -> String
     func signInWithGoogle(idToken: String, accessToken: String) async throws -> String
+    func signInWithApple(idToken: String, nonce: String, fullName: PersonNameComponents?) async throws -> String
     func signOut() throws
-    func deleteAccount() async throws
     func getFCMToken() async throws -> String?
 }
 

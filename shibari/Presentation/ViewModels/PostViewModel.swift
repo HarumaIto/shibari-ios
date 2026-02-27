@@ -26,7 +26,8 @@ class PostViewModel {
         }
     }
     // 実際にプレビュー・送信するためのデータ
-    var selectedImageData: Data? = nil
+    var selectedMediaData: Data? = nil
+    var isSelectedMediaVideo: Bool = false
     
     init(questId: String, timelineRepository: TimelineRepository, authRepository: AuthRepository, userRepository: UserRepository, questRepository: QuestRepository) {
         self.questId = questId
@@ -40,27 +41,49 @@ class PostViewModel {
         guard let item = selectedItem else { return }
         isLoading = true
         do {
-            // PhotosPickerItem から Data（画像のバイナリ）を抽出
-            if let data = try await item.loadTransferable(type: Data.self) {
-                // ファイルサイズチェック（50MB = 50 * 1024 * 1024 バイト）
-                let maxSize = 50 * 1024 * 1024
-                if data.count > maxSize {
-                    errorMessage = "画像が大きすぎます。50MB以下のものを選んでください。"
-                    selectedItem = nil
-                    selectedImageData = nil
+            let isVideo = item.supportedContentTypes.contains { type in
+                type.conforms(to: .movie) || type.conforms(to: .video)
+            }
+            
+            if isVideo {
+                if let data = try await item.loadTransferable(type: Data.self) {
+                    let maxVideoSize = 50 * 1024 * 1024 // 50MB
+                    if data.count > maxVideoSize {
+                        errorMessage = "動画が大きすぎます。50MB以下のものを選んでください。"
+                        selectedItem = nil
+                        selectedMediaData = nil
+                    } else {
+                        isSelectedMediaVideo = true
+                        selectedMediaData = data
+                    }
+                }
+            } else {
+                if let data = try await item.loadTransferable(type: Data.self),
+                   let image = UIImage(data: data) {
+                    // 先ほど作成したヘルパー関数を使用
+                    if let compressedData = ImageHelper.compressImage(image: image, maxSize: 1080, quality: 0.8) {
+                        isSelectedMediaVideo = false
+                        selectedMediaData = compressedData
+                    } else {
+                        errorMessage = "画像の処理に失敗しました。"
+                        selectedItem = nil
+                        selectedMediaData = nil
+                    }
                 } else {
-                    selectedImageData = data
+                    errorMessage = "対応していない画像フォーマットです。"
+                    selectedItem = nil
+                    selectedMediaData = nil
                 }
             }
         } catch {
-            errorMessage = "画像の読み込みに失敗しました"
+            errorMessage = "メディアの読み込みに失敗しました"
         }
         isLoading = false
     }
     
     func submitPost() async {
-        guard let mediaData = selectedImageData else {
-            errorMessage = "証拠画像を選択してください"
+        guard let mediaData = selectedMediaData else {
+            errorMessage = "証拠メディアを選択してください"
             return
         }
         
@@ -92,7 +115,7 @@ class PostViewModel {
                 groupId: groupId,
                 author: authorSnapshot,
                 quest: questSnapshot,
-                mediaType: .image,
+                mediaType: isSelectedMediaVideo ? .video : .image,
                 comment: comment,
                 status: .pending
             )

@@ -7,6 +7,7 @@ struct ProfileView: View {
     @State private var showingLogoutAlert = false
     @State private var showingDeleteAlert = false
     @State private var showingEditProfile = false
+    @State private var showingQuestsProfile = false
 
     var body: some View {
         ZStack {
@@ -90,10 +91,22 @@ struct ProfileView: View {
                         }
                         
                         VStack(alignment: .leading, spacing: 12) {
-                            Text("参加中の縛り")
-                                .font(.headline)
-                                .foregroundColor(.textSecondary)
-                                .padding(.horizontal, 16)
+                            HStack {
+                                Text("参加中の縛り")
+                                    .font(.headline)
+                                    .foregroundColor(.textSecondary)
+                                    .padding(.horizontal, 16)
+                                Spacer()
+                                Button {
+                                    showingQuestsProfile = true
+                                } label: {
+                                    Image(systemName: "pencil")
+                                        .foregroundColor(.textSecondary)
+                                        .padding(.horizontal, 8)
+                                        .padding(.vertical, 16)
+                                }
+                            }
+                            
                             
                             if viewModel.participatingQuests.isEmpty {
                                 Text("現在参加している縛りはありません。")
@@ -201,6 +214,25 @@ struct ProfileView: View {
                 )
             )
         }
+        .onChange(of: showingEditProfile) { _, newValue in
+            if newValue == false { reloadProfileIfNeeded() }
+        }
+        .navigationDestination(isPresented: $showingQuestsProfile) {
+            QuestSelectionView(
+                viewModel: QuestSelectionViewModel(
+                    questRepository: QuestRepositoryImpl(),
+                    userRepository: UserRepositoryImpl(),
+                    groupId: viewModel.currentGroup?.id ?? "",
+                    currentUserId: viewModel.currentUser?.id ?? ""
+                ),
+                onNavigateToMain: {
+                    showingQuestsProfile = false
+                }
+            )
+        }
+        .onChange(of: showingQuestsProfile) { _, newValue in
+            if newValue == false { reloadProfileIfNeeded() }
+        }
         .alert("エラー", isPresented: Binding<Bool>(
             get: { viewModel.errorMessage != nil },
             set: { _ in viewModel.errorMessage = nil }
@@ -210,6 +242,12 @@ struct ProfileView: View {
             if let errorMessage = viewModel.errorMessage {
                 Text(errorMessage)
             }
+        }
+    }
+
+    private func reloadProfileIfNeeded() {
+        Task {
+            await viewModel.loadData(forceReload: true)
         }
     }
 }
