@@ -46,7 +46,7 @@ class AuthViewModel {
     func signUpWithEmail() async {
         guard !email.isEmpty, password.count >= 8, checkPassword.count >= 8 else { return }
         
-        if password == checkPassword {
+        if password != checkPassword {
             self.errorMessage = "入力されたパスワードが一致しません。"
             return
         }
