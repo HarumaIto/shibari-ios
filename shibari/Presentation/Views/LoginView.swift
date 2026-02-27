@@ -117,8 +117,8 @@ struct LoginView: View {
 #Preview {
     LoginView(
         viewModel: AuthViewModel(
-            authRepository: AuthRepositoryImpl(),
-            userRepository: UserRepositoryImpl()
+            authRepository: AuthRepositoryMock(),
+            userRepository: UserRepositoryMock()
         ),
         onNavigateToNext: {}
     )

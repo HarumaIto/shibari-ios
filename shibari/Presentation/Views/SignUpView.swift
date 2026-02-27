@@ -152,8 +152,8 @@ struct SignUpView: View {
 #Preview {
     SignUpView(
         viewModel: AuthViewModel(
-            authRepository: AuthRepositoryImpl(),
-            userRepository: UserRepositoryImpl()
+            authRepository: AuthRepositoryMock(),
+            userRepository: UserRepositoryMock()
         ),
         onNavigateToNext: {}
     )
