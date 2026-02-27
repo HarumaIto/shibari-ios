@@ -1,41 +1,60 @@
 import SwiftUI
 import PhotosUI
-import AVKit
 
 struct PostView: View {
     @Bindable var viewModel: PostViewModel
-    
+    // ★追加: 前の画面に戻るための環境変数（Androidの onNavigateBack の代わり）
     @Environment(\.dismiss) private var dismiss
     
-    @State private var videoPlayer: AVPlayer?
-
     var body: some View {
         ZStack {
             Color.slateBackground.ignoresSafeArea()
             
             ScrollView {
                 VStack(spacing: 24) {
-                    // メインのUI定義が圧倒的にスッキリします
-                    mediaContainer
+                    
+                    // --- 1. 画像プレビューエリア ---
+                    Rectangle()
+                        .fill(Color.slateSurfaceVariant)
+                        .aspectRatio(1.0, contentMode: .fit)
+                        .cornerRadius(16)
+                        .overlay(
+                            SwiftUI.Group {
+                                if let data = viewModel.selectedImageData, let uiImage = UIImage(data: data) {
+                                    // 選択された画像を表示
+                                    Image(uiImage: uiImage)
+                                        .resizable()
+                                        .scaledToFill()
+                                } else {
+                                    // 画像が未選択の場合は、ここをタップしてライブラリを開く
+                                    PhotosPicker(selection: $viewModel.selectedItem, matching: .images, photoLibrary: .shared()) {
+                                        Image(systemName: "plus.circle.fill")
+                                            .font(.system(size: 64))
+                                            .foregroundColor(.tacticalRed)
+                                    }
+                                }
+                            }
+                        )
+                        .clipped()
                         .padding(.horizontal, 16)
                         .padding(.top, 16)
-                        .onChange(of: viewModel.selectedMediaData) { _, newData in
-                            handleMediaChange(newData: newData)
-                        }
                     
-                    if viewModel.selectedMediaData != nil {
-                        PhotosPicker(selection: $viewModel.selectedItem, matching: .any(of: [.images, .videos]), photoLibrary: .shared()) {
-                            Text("メディアを選び直す")
+                    // --- 2. 写真を選び直すボタン ---
+                    if viewModel.selectedImageData != nil {
+                        PhotosPicker(selection: $viewModel.selectedItem, matching: .images, photoLibrary: .shared()) {
+                            Text("写真を選び直す")
                                 .fontWeight(.bold)
                                 .foregroundColor(.textSecondary)
                         }
                     }
                     
+                    // --- 3. コメント入力 ---
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("一言コメント（任意）")
+                        Text("一言コメント (任意)")
                             .foregroundColor(.textSecondary)
                             .font(.subheadline)
                         
+                        // Androidの OutlinedTextField に近いデザイン
                         TextEditor(text: $viewModel.comment)
                             .frame(height: 120)
                             .padding(8)
@@ -52,6 +71,7 @@ struct PostView: View {
                     
                     Spacer(minLength: 40)
                     
+                    // --- 4. 送信ボタン ---
                     Button(action: {
                         Task { await viewModel.submitPost() }
                     }) {
@@ -68,7 +88,7 @@ struct PostView: View {
                     .foregroundColor(.white)
                     .cornerRadius(12)
                     .padding(.horizontal, 16)
-                    .disabled(viewModel.isLoading || viewModel.selectedMediaData == nil)
+                    .disabled(viewModel.isLoading || viewModel.selectedImageData == nil)
                     
                     Spacer(minLength: 40)
                 }
@@ -76,12 +96,15 @@ struct PostView: View {
         }
         .navigationTitle("証拠を提出")
         .navigationBarTitleDisplayMode(.inline)
+        // キーボード外をタップしたら閉じる
         .onTapGesture {
             UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
         }
+        // ★ 投稿成功時、自動で前の画面（今日のノルマ）に戻る
         .onChange(of: viewModel.isCompleted) { _, isCompleted in
             if isCompleted { dismiss() }
         }
+        // エラー時のアラート
         .alert("エラー", isPresented: Binding<Bool>(
             get: { viewModel.errorMessage != nil },
             set: { _ in viewModel.errorMessage = nil }
@@ -90,59 +113,6 @@ struct PostView: View {
         } message: {
             if let errorMessage = viewModel.errorMessage {
                 Text(errorMessage)
-            }
-        }
-    }
-
-    
-    // MARK: - Subviews
-    private var mediaContainer: some View {
-        Rectangle()
-            .fill(Color.slateSurfaceVariant)
-            .aspectRatio(1.0, contentMode: .fit)
-            .cornerRadius(16)
-            .overlay(mediaContent) // 中身を別の変数として切り出し
-            .clipped()
-    }
-    
-    @ViewBuilder
-    private var mediaContent: some View {
-        if let data = viewModel.selectedMediaData {
-            if viewModel.isSelectedMediaVideo {
-                // 動画プレビュー
-                if let player = videoPlayer {
-                    VideoPlayer(player: player)
-                } else {
-                    ProgressView().progressViewStyle(CircularProgressViewStyle(tint: .white))
-                }
-            } else if let uiImage = UIImage(data: data) {
-                // 画像プレビュー
-                Image(uiImage: uiImage)
-                    .resizable()
-                    .scaledToFill()
-            }
-        } else {
-            // 未選択状態
-            PhotosPicker(selection: $viewModel.selectedItem, matching: .any(of: [.images, .videos]), photoLibrary: .shared()) {
-                Image(systemName: "plus.circle.fill")
-                    .font(.system(size: 64))
-                    .foregroundColor(.tacticalRed)
-            }
-        }
-    }
-    
-    // MARK: - Methods
-    private func handleMediaChange(newData: Data?) {
-        videoPlayer?.pause()
-        videoPlayer = nil
-        
-        if viewModel.isSelectedMediaVideo, let data = newData {
-            let tempFileURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + ".mp4")
-            do {
-                try data.write(to: tempFileURL)
-                videoPlayer = AVPlayer(url: tempFileURL)
-            } catch {
-                viewModel.errorMessage = "動画のプレビューに失敗しました"
             }
         }
     }
