@@ -87,13 +87,17 @@ fileprivate struct CardView: View {
     let quest: Quest
     let onPostClick: () -> Void
     
+    private var isCompletedRoutine: Bool {
+        quest.type == .ROUTINE && quest.frequency != .ALWAYS && quest.isCompleted
+    }
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             VStack(alignment: .leading, spacing: 8) {
                 Text(quest.title)
                     .font(.title3)
                     .fontWeight(.bold)
-                    .foregroundColor(.textPrimary)
+                    .foregroundColor(isCompletedRoutine ? .textSecondary : .textPrimary)
                 
                 Text(quest.description)
                     .font(.body)
@@ -102,24 +106,42 @@ fileprivate struct CardView: View {
             .padding(16)
             
             HStack {
+                if isCompletedRoutine {
+                    HStack(spacing: 4) {
+                        Image(systemName: "checkmark.circle.fill")
+                        Text("期間内クリア")
+                            .fontWeight(.bold)
+                    }
+                    .font(.caption)
+                    .foregroundColor(.tacticalRed)
+                }
+                
                 Spacer()
                 Button(action: onPostClick) {
                     HStack {
-                        Image(systemName: "plus.circle.fill")
-                        Text("証拠を提出")
+                        Image(systemName: isCompletedRoutine ? "arrow.triangle.2.circlepath" : "plus.circle.fill")
+                        Text(isCompletedRoutine ? "再提出" : "証拠を提出")
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)
-                    .background(Color.tacticalRed)
+                    .background(isCompletedRoutine ? Color.clear : Color.tacticalRed)
                     .foregroundColor(.white)
                     .cornerRadius(8)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(isCompletedRoutine ? Color.white : Color.clear, lineWidth: 0.5)
+                    )
                 }
             }
             .padding(.horizontal, 16)
             .padding(.bottom, 16)
         }
-        .background(Color.slateSurfaceVariant)
+        .background(Color.slateSurfaceVariant.opacity(isCompletedRoutine ? 0.4 : 1.0))
         .cornerRadius(12)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(isCompletedRoutine ? Color.gray.opacity(0.2) : Color.clear, lineWidth: 1)
+        )
     }
 }
 
@@ -128,7 +150,7 @@ fileprivate struct CardView: View {
         viewModel: QuestsViewModel(
             authRepository: AuthRepositoryMock(),
             userRepository: UserRepositoryMock(),
-            questRepository: QuestRepositoryMock()
+            questRepository: QuestRepositoryMock(),
         ),
         onNavigateToPost: {_ in }
     )
