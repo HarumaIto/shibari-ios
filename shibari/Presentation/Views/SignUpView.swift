@@ -49,7 +49,7 @@ struct SignUpView: View {
                         .cornerRadius(8)
                         .foregroundColor(.white)
                     
-                    SecureField("パスワード (確認)", text: $viewModel.password)
+                    SecureField("パスワード (確認)", text: $viewModel.checkPassword)
                         .focused($isFocused)
                         .padding()
                         .background(Color.slateSurface)
@@ -81,7 +81,7 @@ struct SignUpView: View {
                     
                     Button(action: {
                         isFocused = false
-                        Task { await viewModel.signInWithEmail() }
+                        Task { await viewModel.signUpWithEmail() }
                     }) {
                         if viewModel.isLoading {
                             ProgressView().progressViewStyle(CircularProgressViewStyle(tint: .white))
