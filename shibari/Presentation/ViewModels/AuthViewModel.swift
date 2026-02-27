@@ -96,6 +96,10 @@ class AuthViewModel {
     }
         
     func handleSignInWithAppleCompletion(_ result: Result<ASAuthorization, Error>) async {
+        isLoading = true
+        errorMessage = nil
+        defer { isLoading = false }
+        
         switch result {
         case .success(let authorization):
             if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential {
