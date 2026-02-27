@@ -3,6 +3,7 @@ import Observation
 import GoogleSignIn
 import AuthenticationServices
 import CryptoKit
+import Security
 
 @MainActor
 @Observable
@@ -135,9 +136,8 @@ class AuthViewModel {
         var randomBytes = [UInt8](repeating: 0, count: length)
         let errorCode = SecRandomCopyBytes(kSecRandomDefault, randomBytes.count, &randomBytes)
         if errorCode != errSecSuccess {
-            fatalError(
-                "Unable to generate nonce. SecRandomCopyBytes failed with OSStatus \(errorCode)"
-            )
+            errorMessage = "Unable to generate nonce. SecRandomCopyBytes failed with OSStatus \(errorCode)"
+            return ""
         }
         
         let charset: [Character] =
@@ -148,8 +148,7 @@ class AuthViewModel {
             charset[Int(byte) % charset.count]
         }
         
-        currentNonce = String(nonce)
-        return currentNonce!
+        return String(nonce)
     }
     
     private func sha256(_ input: String) -> String {

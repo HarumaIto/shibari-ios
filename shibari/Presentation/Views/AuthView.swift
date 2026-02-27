@@ -156,12 +156,12 @@ struct AuthView: View {
                             viewModel.handleSignInWithAppleRequest(request)
                         } onCompletion: { result in
                             Task {
-                                await                             viewModel.handleSignInWithAppleCompletion(result)
+                                await viewModel.handleSignInWithAppleCompletion(result)
                             }
                         }
                         .signInWithAppleButtonStyle(.whiteOutline)
                         .frame(height: 54)
-                        .allowsHitTesting(!isButtonDisabled)
+                        .disabled(isButtonDisabled)
                         .opacity(isButtonDisabled ? 0.5 : 1.0)
                     }
                     .padding(.horizontal, 32)
