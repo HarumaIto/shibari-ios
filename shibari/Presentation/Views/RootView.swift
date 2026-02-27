@@ -13,11 +13,7 @@ struct RootView: View {
                 }
             } else if viewModel.currentUserId == nil {
                 // 1. 未ログイン ➔ 認証画面
-                AuthView(
-                    viewModel: AuthViewModel(
-                        authRepository: viewModel.authRepository,
-                        userRepository: viewModel.userRepository
-                    ),
+                AuthSelectionView(
                     onNavigateToNext: { viewModel.checkAuthStatus() }
                 )
                 .onChange(of: viewModel.authRepository.getCurrentUserId()) { _, _ in viewModel.checkAuthStatus() }
