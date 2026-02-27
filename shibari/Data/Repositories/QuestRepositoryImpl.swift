@@ -68,6 +68,7 @@ class QuestRepositoryImpl: QuestRepository {
         
         let postsSnapshot = try await db.collection("timelines")
             .whereField("userId", isEqualTo: user.id)
+            .whereField("groupId", isEqualTo: groupId)
             .whereField("createdAt", isGreaterThanOrEqualTo:  queryStartDate)
             .getDocuments()
         
