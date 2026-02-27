@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct AuthSelectionView: View {
+    var viewModel: AuthViewModel
     var onNavigateToNext: () -> Void
     
     @State private var showingLogin = false
@@ -65,29 +66,26 @@ struct AuthSelectionView: View {
             }
             .navigationDestination(isPresented: $showingLogin) {
                 LoginView(
-                    viewModel: generateAuthViewModel(),
+                    viewModel: viewModel,
                     onNavigateToNext: onNavigateToNext
                 )
             }
             .navigationDestination(isPresented: $showingSignUp) {
                 SignUpView(
-                    viewModel: generateAuthViewModel(),
+                    viewModel: viewModel,
                     onNavigateToNext: onNavigateToNext
                 )
             }
         }
     }
-    
-    private func generateAuthViewModel() -> AuthViewModel {
-        AuthViewModel(
-            authRepository: AuthRepositoryImpl(),
-            userRepository: UserRepositoryImpl()
-        )
-    }
 }
 
 #Preview {
     AuthSelectionView(
+        viewModel: AuthViewModel(
+            authRepository: AuthRepositoryMock(),
+            userRepository: UserRepositoryMock()
+        ),
         onNavigateToNext: {}
     )
 }
