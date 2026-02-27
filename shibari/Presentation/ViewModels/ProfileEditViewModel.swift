@@ -53,14 +53,18 @@ class ProfileEditViewModel {
         isLoading = true
         do {
             if let data = try await item.loadTransferable(type: Data.self) {
-                // アイコンなので5MB程度に制限
-                let maxSize = 5 * 1024 * 1024
-                if data.count > maxSize {
-                    errorMessage = "画像が大きすぎます。5MB以下のものを選んでください。"
+                if let image = UIImage(data: data) {
+                    if let compressedData = ImageHelper.compressImage(image: image, maxSize: 512, quality: 0.7) {
+                        selectedImageData = compressedData
+                    } else {
+                        errorMessage = "画像の処理に失敗しました"
+                        selectedItem = nil
+                        selectedImageData = nil
+                    }
+                } else {
+                    errorMessage = "対応していない画像フォーマットです。"
                     selectedItem = nil
                     selectedImageData = nil
-                } else {
-                    selectedImageData = data
                 }
             }
         } catch {
