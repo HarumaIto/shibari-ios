@@ -78,7 +78,7 @@ struct SignUpView: View {
                 
                 VStack(spacing: 16) {
                     let isButtonDisabled = viewModel.isLoading || !viewModel.isAgreedToTerms
-                    
+                    let isRegisterDisabled = isButtonDisabled || viewModel.email.isEmpty || viewModel.password.count < 8 || viewModel.checkPassword.count < 8
                     Button(action: {
                         isFocused = false
                         Task { await viewModel.signUpWithEmail() }
@@ -95,8 +95,8 @@ struct SignUpView: View {
                     .background(Color.tacticalRed)
                     .foregroundColor(.white)
                     .cornerRadius(12)
-                    .opacity(isButtonDisabled || viewModel.email.isEmpty || viewModel.password.count < 8 || viewModel.checkPassword.count < 8 ? 0.5 : 1.0)
-                    .disabled(isButtonDisabled || viewModel.email.isEmpty || viewModel.password.count < 8 || viewModel.checkPassword.count < 8)
+                    .opacity(isRegisterDisabled ? 0.5 : 1.0)
+                    .disabled(isRegisterDisabled)
                     
                     Divider()
                         .background(Color.slateSurfaceVariant)
