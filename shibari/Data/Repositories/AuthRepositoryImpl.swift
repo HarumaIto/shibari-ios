@@ -40,4 +40,15 @@ class AuthRepositoryImpl: AuthRepository {
         
         return authResult.user.uid
     }
+    
+    func signInWithApple(idToken: String, nonce: String, fullName: PersonNameComponents?) async throws -> String {
+        let credential = OAuthProvider.appleCredential(
+            withIDToken: idToken,
+            rawNonce: nonce,
+            fullName: fullName
+        )
+        let authResult = try await auth.signIn(with: credential)
+        
+        return authResult.user.uid
+    }
 }
