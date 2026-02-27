@@ -31,7 +31,7 @@ class QuestSelectionViewModel {
     private func loadQuests() async {
         isLoading = true
         do {
-            self.quests = try await questRepository.getQuests(groupId: groupId)
+            self.quests = try await questRepository.getGroupQuests(groupId: groupId)
             if let user = try await userRepository.getUser(userId: currentUserId) {
                 self.selectedQuestIds = Set(user.participatingQuestIds)
             }
