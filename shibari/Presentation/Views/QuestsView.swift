@@ -122,3 +122,14 @@ fileprivate struct CardView: View {
         .cornerRadius(12)
     }
 }
+
+#Preview {
+    QuestsView(
+        viewModel: QuestsViewModel(
+            authRepository: AuthRepositoryMock(),
+            userRepository: UserRepositoryMock(),
+            questRepository: QuestRepositoryMock()
+        ),
+        onNavigateToPost: {_ in }
+    )
+}
