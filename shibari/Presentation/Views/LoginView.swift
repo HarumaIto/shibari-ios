@@ -78,7 +78,7 @@ struct LoginView: View {
                     }) {
                         HStack {
                             Image(systemName: "g.circle.fill")
-                            Text("Googleアカウントで登録")
+                            Text("Googleアカウントでログイン")
                                 .fontWeight(.bold)
                         }
                     }
