@@ -9,7 +9,7 @@ class UserRepositoryMock: UserRepository {
                 "mock_quest_id_123",
                 "mock_quest_id_456"
             ],
-            groupId: "mock_group_id_456",
+            groupId: "mock_group_id_123",
             blockedUserIds: []
         )
     }
