@@ -53,13 +53,13 @@ struct TimelineView: View {
                 leading: NavigationLink(
                     destination: GroupView(groupId: "")) {
                         Image(systemName: "person.2.fill")
-                            .font(.system(size: 18))
+                            .font(.system(size: 14))
                             .foregroundColor(.white)
                     },
                 trailing: NavigationLink(
                     destination: NotificationsView()) {
                         Image(systemName: "bell.fill")
-                            .font(.system(size: 18))
+                            .font(.system(size: 14))
                             .foregroundColor(.white)
                     }
             )
