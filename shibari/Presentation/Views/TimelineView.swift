@@ -2,6 +2,8 @@ import SwiftUI
 
 struct TimelineView: View {
     @Bindable var viewModel: TimelineViewModel
+    let groupRepository: GroupRepository
+    let authRepository: AuthRepository
     
     var body: some View {
         ZStack {
@@ -53,9 +55,9 @@ struct TimelineView: View {
                 NavigationLink(
                     destination: GroupView(
                         viewModel: GroupViewModel(
-                            groupRepository: GroupRepositoryImpl(),
-                            authRepository: AuthRepositoryImpl(),
-                            userRepository: UserRepositoryImpl()
+                            groupRepository: groupRepository,
+                            authRepository: authRepository,
+                            userRepository: viewModel.userRepository
                         ),
                     )) {
                         Image(systemName: "person.2.fill")
@@ -90,6 +92,8 @@ struct TimelineView: View {
             reportRepository: ReportRepositoryMock(),
             currentUserId: "mock_user_id_123",
             groupId: "mock_group_id_123"
-        )
+        ),
+        groupRepository: GroupRepositoryMock(),
+        authRepository: AuthRepositoryMock()
     )
 }

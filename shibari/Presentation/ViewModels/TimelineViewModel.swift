@@ -6,7 +6,7 @@ import FirebaseFirestore // エラー判定用
 @Observable
 class TimelineViewModel {
     private let timelineRepository: TimelineRepository
-    private let userRepository: UserRepository
+    let userRepository: UserRepository
     private let reportRepository: ReportRepository
     
     let currentUserId: String

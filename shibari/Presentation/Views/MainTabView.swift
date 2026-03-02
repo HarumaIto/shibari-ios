@@ -23,7 +23,9 @@ struct MainTabView: View {
                         reportRepository: reportRepository,
                         currentUserId: currentUserId,
                         groupId: groupId
-                    )
+                    ),
+                    groupRepository: groupRepository,
+                    authRepository: authRepository
                 )
             }
             .tabItem {
