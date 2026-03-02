@@ -16,6 +16,15 @@ class UserRepositoryImpl: UserRepository {
         return dto.toDomain()
     }
     
+    func getUsers(userIds: [String]) async throws -> [User] {
+        let snapshot = try await usersCollection
+            .whereField(FieldPath.documentID(), in: userIds)
+            .getDocuments()
+        
+        let dtos = snapshot.documents.compactMap{ try? $0.data(as: UserDto.self) }
+        return dtos.map { $0.toDomain() }
+    }
+    
     func createUser(user: User) async throws {
         let dto = UserDto.fromDomain(user)
         guard let userId = dto.id else { return }
