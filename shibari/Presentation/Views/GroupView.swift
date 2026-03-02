@@ -11,6 +11,19 @@ struct GroupView: View {
             
             if viewModel.isLoading {
                 ProgressView().progressViewStyle(CircularProgressViewStyle(tint: .tacticalRed))
+            } else if viewModel.errorMessage != nil  || viewModel.group == nil {
+                VStack(spacing: 16) {
+                    Text("エラー: \(viewModel.errorMessage!)")
+                        .foregroundColor(.red)
+                    Button("再読み込み") {
+                        Task { await viewModel.loadGroup() }
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 12)
+                    .background(Color.slateSurface)
+                    .foregroundColor(.white)
+                    .cornerRadius(8)
+                }
             } else {
                 ScrollView {
                     VStack(spacing: 24) {
