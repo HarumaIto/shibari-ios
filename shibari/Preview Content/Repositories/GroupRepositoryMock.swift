@@ -12,7 +12,8 @@ class GroupRepositoryMock: GroupRepository {
             description: "Mock group description",
             ownerId: "mock_user_id_123",
             memberIds: [
-                "mock_user_id_123"
+                "mock_user_id_123",
+                "mock_user_id_456"
             ],
             invitationCode: "MOCK_INVITATION_CODE"
         )
