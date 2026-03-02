@@ -14,6 +14,7 @@ class AuthViewModel {
     // UI側の状態（State）
     var email = ""
     var password = ""
+    var checkPassword = ""
     var isLoading: Bool = false
     var errorMessage: String? = nil
     var currentUserId: String? = nil
@@ -43,10 +44,16 @@ class AuthViewModel {
     
     // メールアドレスで新規登録
     func signUpWithEmail() async {
-        guard !email.isEmpty, password.count >= 6 else { return }
+        guard !email.isEmpty, password.count >= 8, checkPassword.count >= 8 else { return }
+        
+        if password != checkPassword {
+            self.errorMessage = "入力されたパスワードが一致しません。"
+            return
+        }
+        
         isLoading = true
         errorMessage = nil
-        
+
         do {
             let userId = try await authRepository.signUp(email: email, password: password)
             self.currentUserId = userId

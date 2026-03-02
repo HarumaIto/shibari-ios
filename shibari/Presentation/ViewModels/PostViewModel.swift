@@ -100,7 +100,7 @@ class PostViewModel {
                 throw NSError(domain: "", code: 403, userInfo: [NSLocalizedDescriptionKey: "グループに所属していません。"])
             }
             
-            let allQuests = try await questRepository.getQuests(groupId: groupId)
+            let allQuests = try await questRepository.getGroupQuests(groupId: groupId)
             guard let quest = allQuests.first(where: { $0.id == questId }) else {
                 throw NSError(domain: "", code: 404, userInfo: [NSLocalizedDescriptionKey: "クエスト情報が見つかりません。"])
             }

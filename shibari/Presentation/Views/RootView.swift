@@ -13,7 +13,7 @@ struct RootView: View {
                 }
             } else if viewModel.currentUserId == nil {
                 // 1. 未ログイン ➔ 認証画面
-                AuthView(
+                AuthSelectionView(
                     viewModel: AuthViewModel(
                         authRepository: viewModel.authRepository,
                         userRepository: viewModel.userRepository
