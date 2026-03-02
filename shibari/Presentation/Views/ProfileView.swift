@@ -8,6 +8,7 @@ struct ProfileView: View {
     @State private var showingDeleteAlert = false
     @State private var showingEditProfile = false
     @State private var showingQuestsProfile = false
+    @State private var showingGroupView = false
     @State private var isCopied = false
 
     var body: some View {
@@ -95,6 +96,19 @@ struct ProfileView: View {
                                             }
                                         }) {
                                             Image(systemName: isCopied ? "checkmark" : "doc.on.doc")
+                                                .foregroundColor(.textSecondary)
+                                        }
+                                    }
+                                    Divider().background(Color.slateSurfaceVariant)
+                                    
+                                    Button(action: {
+                                        showingGroupView = true
+                                    }) {
+                                        HStack {
+                                            Text("グループ詳細")
+                                                .foregroundColor(.textSecondary)
+                                            Spacer()
+                                            Image(systemName: "chevron.right")
                                                 .foregroundColor(.textSecondary)
                                         }
                                     }
@@ -248,6 +262,14 @@ struct ProfileView: View {
         }
         .onChange(of: showingQuestsProfile) { _, newValue in
             if newValue == false { reloadProfileIfNeeded() }
+        }
+        .navigationDestination(isPresented: $showingGroupView) {
+            if let group = viewModel.currentGroup {
+                GroupView(
+                    group: group,
+                    questRepository: QuestRepositoryImpl()
+                )
+            }
         }
         .alert("エラー", isPresented: Binding<Bool>(
             get: { viewModel.errorMessage != nil },
