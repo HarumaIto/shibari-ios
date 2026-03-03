@@ -37,6 +37,7 @@ protocol QuestRepository {
     func getGroupQuests(groupId: String) async throws -> [Quest]
     func getMyQuests(groupId: String, user: User) async throws -> [Quest]
     func createQuest(quest: Quest) async throws
+    func updateQuest(quest: Quest) async throws
 }
 
 // MARK: - Report Repository Protocol

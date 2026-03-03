@@ -39,4 +39,6 @@ class QuestRepositoryMock: QuestRepository {
     }
     
     func createQuest(quest: Quest) async throws { }
+
+    func updateQuest(quest: Quest) async throws { }
 }

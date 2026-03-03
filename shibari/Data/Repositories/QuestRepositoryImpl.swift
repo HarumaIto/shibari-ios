@@ -108,4 +108,9 @@ class QuestRepositoryImpl: QuestRepository {
         newQuest.id = docRef.documentID
         try docRef.setData(from: newQuest)
     }
+
+    func updateQuest(quest: Quest) async throws {
+        let dto = QuestDto.fromDomain(quest)
+        try db.collection("quests").document(quest.id).setData(from: dto)
+    }
 }
