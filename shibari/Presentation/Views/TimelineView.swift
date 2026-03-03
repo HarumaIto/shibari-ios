@@ -57,6 +57,7 @@ struct TimelineView: View {
                             authRepository: AuthRepositoryImpl(),
                             userRepository: UserRepositoryImpl()
                         ),
+                        questRepository: QuestRepositoryImpl()
                     )) {
                         Image(systemName: "person.2.fill")
                             .font(.system(size: 14))
