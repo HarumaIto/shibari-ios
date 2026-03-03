@@ -15,6 +15,7 @@ protocol AuthRepository {
 // MARK: - User Repository Protocol
 protocol UserRepository {
     func getUser(userId: String) async throws -> User?
+    func getUsers(userIds: [String]) async throws -> [User]
     func createUser(user: User) async throws
     func updateGroupId(userId: String, groupId: String) async throws
     func updateQuestIds(userId: String, ids: [String]) async throws

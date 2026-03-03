@@ -48,6 +48,30 @@ struct TimelineView: View {
         }
         .navigationTitle("タイムライン")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                NavigationLink(
+                    destination: GroupView(
+                        viewModel: GroupViewModel(
+                            groupRepository: GroupRepositoryImpl(),
+                            authRepository: AuthRepositoryImpl(),
+                            userRepository: UserRepositoryImpl()
+                        ),
+                    )) {
+                        Image(systemName: "person.2.fill")
+                            .font(.system(size: 14))
+                            .foregroundColor(.white)
+                    }
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                NavigationLink(
+                    destination: NotificationsView()) {
+                        Image(systemName: "bell.fill")
+                            .font(.system(size: 14))
+                            .foregroundColor(.white)
+                    }
+            }
+        }
         .onDisappear {
             viewModel.stopObserving()
         }
@@ -55,4 +79,17 @@ struct TimelineView: View {
             viewModel.startObserving()
         }
     }
+}
+
+
+#Preview {
+    TimelineView(
+        viewModel: TimelineViewModel(
+            timelineRepository: TimelineRepositoryMock(),
+            userRepository: UserRepositoryMock(),
+            reportRepository: ReportRepositoryMock(),
+            currentUserId: "mock_user_id_123",
+            groupId: "mock_group_id_123"
+        )
+    )
 }

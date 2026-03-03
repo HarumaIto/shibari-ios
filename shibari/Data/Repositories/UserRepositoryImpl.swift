@@ -16,6 +16,30 @@ class UserRepositoryImpl: UserRepository {
         return dto.toDomain()
     }
     
+    func getUsers(userIds: [String]) async throws -> [User] {
+        guard !userIds.isEmpty else { return [] }
+        
+        var allDtos: [UserDto] = []
+        
+        let chunkSize = 10
+        var index = 0
+        while index < userIds.count {
+            let endIndex = min(index + chunkSize, userIds.count)
+            let chunk = Array(userIds[index..<endIndex])
+            
+            let snapshot = try await usersCollection
+                .whereField(FieldPath.documentID(), in: chunk)
+                .getDocuments()
+            
+            let dtos = snapshot.documents.compactMap { try? $0.data(as: UserDto.self) }
+            allDtos.append(contentsOf: dtos)
+            
+            index = endIndex
+        }
+        
+        return allDtos.map { $0.toDomain() }
+    }
+    
     func createUser(user: User) async throws {
         let dto = UserDto.fromDomain(user)
         guard let userId = dto.id else { return }

@@ -3,7 +3,7 @@ class QuestRepositoryMock: QuestRepository {
         return [
             Quest(
                 id: "mock_quest_id_123",
-                groupId: "mock_group_id_456",
+                groupId: "mock_group_id_123",
                 title: "Mock quest",
                 type: QuestType.ROUTINE,
                 frequency: QuestFrequency.DAILY,
@@ -17,7 +17,7 @@ class QuestRepositoryMock: QuestRepository {
         return [
             Quest(
                 id: "mock_quest_id_123",
-                groupId: "mock_group_id_456",
+                groupId: "mock_group_id_123",
                 title: "Mock quest",
                 type: QuestType.ROUTINE,
                 frequency: QuestFrequency.DAILY,
@@ -27,7 +27,7 @@ class QuestRepositoryMock: QuestRepository {
             ),
             Quest(
                 id: "mock_quest_id_456",
-                groupId: "mock_group_id_456",
+                groupId: "mock_group_id_123",
                 title: "Mock quest2",
                 type: QuestType.ROUTINE,
                 frequency: QuestFrequency.DAILY,
