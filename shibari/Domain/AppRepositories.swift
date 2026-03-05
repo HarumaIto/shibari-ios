@@ -58,4 +58,5 @@ protocol TimelineRepository {
 // MARK: - Notification Repository Protocol
 protocol NotificationRepository {
     func getNotifications(userId: String) async throws -> [AppNotification]
+    func markAllAsRead(userId: String, ids: [String]) async throws
 }

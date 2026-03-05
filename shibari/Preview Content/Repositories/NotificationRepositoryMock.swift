@@ -76,4 +76,7 @@ class NotificationRepositoryMock: NotificationRepository {
             ),
         ]
     }
+    
+    
+    func markAllAsRead(userId: String, ids: [String]) async throws {}
 }

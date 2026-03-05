@@ -53,6 +53,7 @@ struct NotificationsView: View {
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await viewModel.loadNotifications()
+            await viewModel.markAllAsRead()
         }
     }
 }

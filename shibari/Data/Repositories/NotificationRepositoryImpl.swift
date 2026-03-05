@@ -17,4 +17,19 @@ class NotificationRepositoryImpl: NotificationRepository {
         }
     }
     
+    
+    func markAllAsRead(userId: String, ids: [String]) async throws {
+        let batch = db.batch()
+        
+        for id in ids {
+            let docRef = db.collection("users")
+                .document(userId)
+                .collection("notifications")
+                .document(id)
+            
+            batch.updateData(["isRead": true], forDocument: docRef)
+        }
+        
+        try await batch.commit()
+    }
 }
