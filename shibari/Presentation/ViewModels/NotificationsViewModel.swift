@@ -34,16 +34,10 @@ class NotificationsViewModel {
         }
     }
     
-    // 一覧画面を開いたときの処理（一括既読）
     func markAllAsRead() async {
         let unreadIds = notifications.filter { !$0.isRead }.map { $0.id }
         if unreadIds.isEmpty || currentUid.isEmpty { return }
-        
-        // UIをすべて既読に更新
-        for i in 0..<notifications.count {
-            notifications[i].isRead = true
-        }
-        
+
         do {
             try await notificationRepository.markAllAsRead(
                 userId: currentUid,
