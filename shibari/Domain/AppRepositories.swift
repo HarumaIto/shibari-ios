@@ -54,3 +54,9 @@ protocol TimelineRepository {
     func getCommentsStream(postId: String) -> AsyncThrowingStream<[Comment], Error>
     func addComment(postId: String, author: AuthorSnapshot, userId: String, text: String) async throws
 }
+
+// MARK: - Notification Repository Protocol
+protocol NotificationRepository {
+    func getNotifications(userId: String) async throws -> [AppNotification]
+    func markAllAsRead(userId: String, ids: [String]) async throws
+}

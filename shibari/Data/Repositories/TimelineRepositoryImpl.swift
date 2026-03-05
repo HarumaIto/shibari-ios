@@ -81,7 +81,6 @@ class TimelineRepositoryImpl: TimelineRepository {
                 
                 // 投票を記録
                 dto.votes[userId] = voteType.rawValue
-                dto.approvalCount = dto.votes.values.filter { $0 == VoteType.APPROVE.rawValue } .count
                 
                 try transaction.setData(from: dto, forDocument: postRef)
             } catch let fetchError as NSError {

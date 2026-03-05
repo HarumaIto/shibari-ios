@@ -66,7 +66,12 @@ struct TimelineView: View {
             }
             ToolbarItem(placement: .topBarTrailing) {
                 NavigationLink(
-                    destination: NotificationsView()) {
+                    destination: NotificationsView(
+                        viewModel: NotificationsViewModel(
+                            notificationRepository: NotificationRepositoryImpl(),
+                            authRepository: AuthRepositoryImpl()
+                        )
+                    )) {
                         Image(systemName: "bell.fill")
                             .font(.system(size: 14))
                             .foregroundColor(.white)
