@@ -5,7 +5,7 @@ class NotificationRepositoryImpl: NotificationRepository {
     
     func getNotifications(userId: String) async throws -> [AppNotification] {
         let snapshot = try await db.collection("users")
-            .document()
+            .document(userId)
             .collection("notifications")
             .order(by: "createdAt", descending: true)
             .limit(to: 50)
