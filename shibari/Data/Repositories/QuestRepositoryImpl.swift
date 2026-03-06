@@ -33,8 +33,6 @@ class QuestRepositoryImpl: QuestRepository {
         
         let calendar = Calendar.current
         let now = Date()
-        guard let startOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: .now)) else { return [] }
-        
         
         // Determine the minimal required start date based on quest frequencies
         let frequencies = Set(quests.map { $0.frequency })
@@ -81,7 +79,7 @@ class QuestRepositoryImpl: QuestRepository {
             
             if postsForThisQuest.isEmpty {
                 updatedQuest.isCompleted = false
-                return quest
+                return updatedQuest
             }
             
             updatedQuest.isCompleted = postsForThisQuest.contains { post in
@@ -109,5 +107,10 @@ class QuestRepositoryImpl: QuestRepository {
         var newQuest = QuestDto.fromDomain(quest)
         newQuest.id = docRef.documentID
         try docRef.setData(from: newQuest)
+    }
+
+    func updateQuest(quest: Quest) async throws {
+        let dto = QuestDto.fromDomain(quest)
+        try db.collection("quests").document(quest.id).setData(from: dto)
     }
 }

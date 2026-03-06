@@ -14,9 +14,18 @@ enum VoteType: String, Codable {
     case REJECT
 }
 
-enum QuestType: String, Codable {
+enum QuestType: String, Codable, CaseIterable {
     case PROHIBITION
     case ROUTINE
     case ACHIEVEMENT
     case CHALLENGE
+
+    var displayName: String {
+        switch self {
+        case .PROHIBITION: return "禁止"
+        case .ROUTINE: return "ルーティン"
+        case .ACHIEVEMENT: return "達成"
+        case .CHALLENGE: return "チャレンジ"
+        }
+    }
 }

@@ -15,6 +15,7 @@ protocol AuthRepository {
 // MARK: - User Repository Protocol
 protocol UserRepository {
     func getUser(userId: String) async throws -> User?
+    func getUsers(userIds: [String]) async throws -> [User]
     func createUser(user: User) async throws
     func updateGroupId(userId: String, groupId: String) async throws
     func updateQuestIds(userId: String, ids: [String]) async throws
@@ -36,6 +37,7 @@ protocol QuestRepository {
     func getGroupQuests(groupId: String) async throws -> [Quest]
     func getMyQuests(groupId: String, user: User) async throws -> [Quest]
     func createQuest(quest: Quest) async throws
+    func updateQuest(quest: Quest) async throws
 }
 
 // MARK: - Report Repository Protocol
@@ -51,4 +53,10 @@ protocol TimelineRepository {
     func votePost(postId: String, userId: String, voteType: VoteType) async throws
     func getCommentsStream(postId: String) -> AsyncThrowingStream<[Comment], Error>
     func addComment(postId: String, author: AuthorSnapshot, userId: String, text: String) async throws
+}
+
+// MARK: - Notification Repository Protocol
+protocol NotificationRepository {
+    func getNotifications(userId: String) async throws -> [AppNotification]
+    func markAllAsRead(userId: String, ids: [String]) async throws
 }
