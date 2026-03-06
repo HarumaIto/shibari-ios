@@ -2,7 +2,7 @@ import SwiftUI
 
 struct GroupView: View {
     @Bindable var viewModel: GroupViewModel
-    let questRepository: QuestRepository
+    @EnvironmentObject var diContainer: AppDIContainer
 
     @State private var showCopyToast = false
     
@@ -72,12 +72,7 @@ struct GroupView: View {
     }
     
     private var questsNavigationSection: some View {
-        NavigationLink(destination: GroupQuestListView(
-            viewModel: GroupQuestListViewModel(
-                questRepository: questRepository,
-                groupId: viewModel.group!.id
-            )
-        )) {
+        NavigationLink(destination: diContainer.makeGroupQuestListView(groupId: viewModel.group!.id)) {
             HStack(spacing: 16) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 8)
@@ -214,7 +209,7 @@ struct GroupView: View {
             groupRepository: GroupRepositoryMock(),
             authRepository: AuthRepositoryMock(),
             userRepository: UserRepositoryMock()
-        ),
-        questRepository: QuestRepositoryMock()
+        )
     )
+    .environmentObject(AppDIContainer.mock)
 }

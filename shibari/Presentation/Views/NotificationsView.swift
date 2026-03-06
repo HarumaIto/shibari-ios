@@ -88,4 +88,5 @@ struct NotificationsView: View {
             authRepository: AuthRepositoryMock()
         )
     )
+    .environmentObject(AppDIContainer.mock)
 }

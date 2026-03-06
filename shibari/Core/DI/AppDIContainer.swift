@@ -1,0 +1,255 @@
+import SwiftUI
+import Observation
+
+@MainActor
+class AppDIContainer: ObservableObject {
+    // MARK: - Repositories
+    let authRepository: AuthRepository
+    let userRepository: UserRepository
+    let groupRepository: GroupRepository
+    let timelineRepository: TimelineRepository
+    let reportRepository: ReportRepository
+    let questRepository: QuestRepository
+    let notificationRepository: NotificationRepository
+
+    // MARK: - Initializer
+    init(
+        authRepository: AuthRepository = AuthRepositoryImpl(),
+        userRepository: UserRepository = UserRepositoryImpl(),
+        groupRepository: GroupRepository = GroupRepositoryImpl(),
+        timelineRepository: TimelineRepository = TimelineRepositoryImpl(),
+        reportRepository: ReportRepository = ReportRepositoryImpl(),
+        questRepository: QuestRepository = QuestRepositoryImpl(),
+        notificationRepository: NotificationRepository = NotificationRepositoryImpl()
+    ) {
+        self.authRepository = authRepository
+        self.userRepository = userRepository
+        self.groupRepository = groupRepository
+        self.timelineRepository = timelineRepository
+        self.reportRepository = reportRepository
+        self.questRepository = questRepository
+        self.notificationRepository = notificationRepository
+    }
+
+    // MARK: - Mock for Previews
+    static var mock: AppDIContainer {
+        AppDIContainer(
+            authRepository: AuthRepositoryMock(),
+            userRepository: UserRepositoryMock(),
+            groupRepository: GroupRepositoryMock(),
+            timelineRepository: TimelineRepositoryMock(),
+            reportRepository: ReportRepositoryMock(),
+            questRepository: QuestRepositoryMock(),
+            notificationRepository: NotificationRepositoryMock()
+        )
+    }
+
+    // MARK: - View Factories
+
+    @ViewBuilder
+    func makeRootView() -> some View {
+        RootView(viewModel: RootViewModel(
+            authRepository: authRepository,
+            userRepository: userRepository,
+            groupRepository: groupRepository,
+            timelineRepository: timelineRepository,
+            reportRepository: reportRepository,
+            questRepository: questRepository
+        ))
+    }
+
+    @ViewBuilder
+    func makeAuthSelectionView(onNavigateToNext: @escaping () -> Void) -> some View {
+        AuthSelectionView(
+            viewModel: AuthViewModel(
+                authRepository: authRepository,
+                userRepository: userRepository
+            ),
+            onNavigateToNext: onNavigateToNext
+        )
+    }
+
+    @ViewBuilder
+    func makeLoginView(onNavigateToNext: @escaping () -> Void) -> some View {
+        LoginView(
+            viewModel: AuthViewModel(
+                authRepository: authRepository,
+                userRepository: userRepository
+            ),
+            onNavigateToNext: onNavigateToNext
+        )
+    }
+
+    @ViewBuilder
+    func makeSignUpView(onNavigateToNext: @escaping () -> Void) -> some View {
+        SignUpView(
+            viewModel: AuthViewModel(
+                authRepository: authRepository,
+                userRepository: userRepository
+            ),
+            onNavigateToNext: onNavigateToNext
+        )
+    }
+
+    @ViewBuilder
+    func makeProfileSetupView(currentUserId: String, onNavigateToNext: @escaping () -> Void) -> some View {
+        ProfileSetupView(
+            viewModel: ProfileSetupViewModel(
+                userRepository: userRepository,
+                authRepository: authRepository,
+                currentUserId: currentUserId
+            ),
+            onNavigateToNext: onNavigateToNext
+        )
+    }
+
+    @ViewBuilder
+    func makeGroupSelectionView(currentUserId: String, onNavigateToNext: @escaping () -> Void) -> some View {
+        GroupSelectionView(
+            viewModel: GroupSelectionViewModel(
+                groupRepository: groupRepository,
+                userRepository: userRepository,
+                currentUserId: currentUserId
+            ),
+            onNavigateToNext: onNavigateToNext
+        )
+    }
+
+    @ViewBuilder
+    func makeQuestSelectionView(groupId: String, currentUserId: String, onNavigateToMain: @escaping () -> Void) -> some View {
+        QuestSelectionView(
+            viewModel: QuestSelectionViewModel(
+                questRepository: questRepository,
+                userRepository: userRepository,
+                groupId: groupId,
+                currentUserId: currentUserId
+            ),
+            onNavigateToMain: onNavigateToMain
+        )
+    }
+
+    @ViewBuilder
+    func makeMainTabView(currentUserId: String, groupId: String, onLogoutRequest: @escaping () -> Void) -> some View {
+        MainTabView(
+            currentUserId: currentUserId,
+            groupId: groupId,
+            onLogoutRequest: onLogoutRequest
+        )
+    }
+
+    @ViewBuilder
+    func makeTimelineView(currentUserId: String, groupId: String) -> some View {
+        TimelineView(
+            viewModel: TimelineViewModel(
+                timelineRepository: timelineRepository,
+                userRepository: userRepository,
+                reportRepository: reportRepository,
+                currentUserId: currentUserId,
+                groupId: groupId
+            )
+        )
+    }
+
+    @ViewBuilder
+    func makeQuestsView(onNavigateToPost: @escaping (String) -> Void) -> some View {
+        QuestsView(
+            viewModel: QuestsViewModel(
+                authRepository: authRepository,
+                userRepository: userRepository,
+                questRepository: questRepository
+            ),
+            onNavigateToPost: onNavigateToPost
+        )
+    }
+
+    @ViewBuilder
+    func makePostView(questId: String) -> some View {
+        PostView(
+            viewModel: PostViewModel(
+                questId: questId,
+                timelineRepository: timelineRepository,
+                authRepository: authRepository,
+                userRepository: userRepository,
+                questRepository: questRepository
+            )
+        )
+    }
+
+    @ViewBuilder
+    func makeProfileView(onLogout: @escaping () -> Void) -> some View {
+        ProfileView(
+            viewModel: ProfileViewModel(
+                authRepository: authRepository,
+                userRepository: userRepository,
+                groupRepository: groupRepository,
+                questRepository: questRepository
+            ),
+            onLogout: onLogout
+        )
+    }
+
+    @ViewBuilder
+    func makeProfileEditView(currentUserId: String) -> some View {
+        ProfileEditView(
+            viewModel: ProfileEditViewModel(
+                userRepository: userRepository,
+                currentUserId: currentUserId
+            )
+        )
+    }
+
+    @ViewBuilder
+    func makeGroupView() -> some View {
+        GroupView(
+            viewModel: GroupViewModel(
+                groupRepository: groupRepository,
+                authRepository: authRepository,
+                userRepository: userRepository
+            )
+        )
+    }
+
+    @ViewBuilder
+    func makeGroupQuestListView(groupId: String) -> some View {
+        GroupQuestListView(
+            viewModel: GroupQuestListViewModel(
+                questRepository: questRepository,
+                groupId: groupId
+            )
+        )
+    }
+
+    @ViewBuilder
+    func makeQuestFormView(groupId: String, initialQuest: QuestSnapshot?, onSaved: @escaping () -> Void) -> some View {
+        QuestFormView(
+            viewModel: QuestFormViewModel(
+                questRepository: questRepository,
+                groupId: groupId,
+                initialQuest: initialQuest
+            ),
+            onSaved: onSaved
+        )
+    }
+
+    @ViewBuilder
+    func makeNotificationsView() -> some View {
+        NotificationsView(
+            viewModel: NotificationsViewModel(
+                notificationRepository: notificationRepository,
+                authRepository: authRepository
+            )
+        )
+    }
+
+    @ViewBuilder
+    func makeCommentView(postId: String) -> some View {
+        CommentView(
+            viewModel: CommentViewModel(
+                postId: postId,
+                timelineRepository: timelineRepository,
+                userRepository: userRepository,
+                authRepository: authRepository
+            )
+        )
+    }
+}

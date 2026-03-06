@@ -3,6 +3,7 @@ import SwiftUI
 struct AuthSelectionView: View {
     var viewModel: AuthViewModel
     var onNavigateToNext: () -> Void
+    @EnvironmentObject var diContainer: AppDIContainer
     
     @State private var showingLogin = false
     @State private var showingSignUp = false
@@ -65,16 +66,10 @@ struct AuthSelectionView: View {
                 }
             }
             .navigationDestination(isPresented: $showingLogin) {
-                LoginView(
-                    viewModel: viewModel,
-                    onNavigateToNext: onNavigateToNext
-                )
+                    diContainer.makeLoginView(onNavigateToNext: onNavigateToNext)
             }
             .navigationDestination(isPresented: $showingSignUp) {
-                SignUpView(
-                    viewModel: viewModel,
-                    onNavigateToNext: onNavigateToNext
-                )
+                    diContainer.makeSignUpView(onNavigateToNext: onNavigateToNext)
             }
         }
     }
@@ -88,5 +83,6 @@ struct AuthSelectionView: View {
         ),
         onNavigateToNext: {}
     )
+        .environmentObject(AppDIContainer.mock)
 }
 

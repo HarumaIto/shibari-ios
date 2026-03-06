@@ -119,3 +119,15 @@ struct ProfileEditView: View {
         }
     }
 }
+
+#Preview {
+    NavigationStack {
+        ProfileEditView(
+            viewModel: ProfileEditViewModel(
+                userRepository: UserRepositoryMock(),
+                currentUserId: "mock_user_1"
+            )
+        )
+    }
+    .environmentObject(AppDIContainer.mock)
+}

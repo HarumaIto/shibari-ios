@@ -65,3 +65,15 @@ struct ProfileSetupView: View {
         }
     }
 }
+
+#Preview {
+    ProfileSetupView(
+        viewModel: ProfileSetupViewModel(
+            userRepository: UserRepositoryMock(),
+            authRepository: AuthRepositoryMock(),
+            currentUserId: "mock_user_1"
+        ),
+        onNavigateToNext: {}
+    )
+    .environmentObject(AppDIContainer.mock)
+}

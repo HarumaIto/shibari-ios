@@ -12,6 +12,7 @@ struct TimelinePostCard: View {
     @State private var showingReportAlert = false
     @State private var reportReason = ""
     @State private var showingComments = false
+    @EnvironmentObject var diContainer: AppDIContainer
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -157,14 +158,7 @@ struct TimelinePostCard: View {
             }
         }
         .sheet(isPresented: $showingComments) {
-            CommentView(
-                viewModel: CommentViewModel(
-                    postId: post.id,
-                    timelineRepository: TimelineRepositoryImpl(), // 簡易生成
-                    userRepository: UserRepositoryImpl(),       // 簡易生成
-                    currentUserId: currentUserId
-                )
-            )
+            diContainer.makeCommentView(postId: post.id)
             .presentationDetents([.medium, .large])
             .presentationDragIndicator(.visible)
         }
