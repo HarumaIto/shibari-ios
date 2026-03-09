@@ -186,6 +186,8 @@ struct FeedImageView: View {
     
     var body: some View {
         ZStack {
+            Color.slateSurfaceVariant
+            
             if let uiImage = uiImage {
                 Image(uiImage: uiImage)
                     .resizable()
@@ -199,8 +201,9 @@ struct FeedImageView: View {
                         }
                     )
             } else {
-                Color.slateSurfaceVariant
-                    .overlay(ProgressView().progressViewStyle(CircularProgressViewStyle(tint: .tacticalRed)))
+                ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle(tint: .tacticalRed))
+                    .frame(height: 500)
             }
         }
         .onAppear {
@@ -244,15 +247,17 @@ struct FeedVideoPlayer: View {
     var body: some View {
         ZStack {
             // 動画の黒帯部分の背景
-            Color.black
-            
+            Color.slateSurfaceVariant
+
             if let player = player {
                 // iOS標準の動画プレイヤー（再生/一時停止などのコントロール付き）
                 VideoPlayer(player: player)
             } else {
                 // プレイヤーの準備ができるまでのローディング
+                
                 ProgressView()
                     .progressViewStyle(CircularProgressViewStyle(tint: .tacticalRed))
+                    .frame(height: 500)
             }
         }
         .aspectRatio(videoAspectRatio ?? 1.0, contentMode: .fit)
