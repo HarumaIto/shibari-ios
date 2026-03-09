@@ -70,19 +70,16 @@ struct TimelinePostCard: View {
             
             // --- 2. 証拠画像 ---
             if let mediaUrl = URL(string: post.mediaUrl) {
-                Rectangle()
-                    .fill(Color.black)
-                    .aspectRatio(1.0, contentMode: .fit) // 幅に合わせて完璧な正方形にする
-                    .overlay(
-                        SwiftUI.Group {
-                            if post.mediaType == .video {
-                                FeedVideoPlayer(url: mediaUrl)
-                            } else {
-                                FeedImageView(url: mediaUrl)
-                            }
-                        }
-                    )
-                    .clipped()
+                SwiftUI.Group {
+                    if post.mediaType == .video {
+                        FeedVideoPlayer(url: mediaUrl)
+                    } else {
+                        FeedImageView(url: mediaUrl, contentMode: .fit)
+                    }
+                }
+                .frame(maxWidth: .infinity, maxHeight: 500)
+                .background(Color.slateSurfaceVariant)
+                .clipped()
             }
             
             // --- 3. コメントと投票エリア ---
@@ -179,6 +176,7 @@ struct TimelinePostCard: View {
 // MARK: - タイムライン専用 画像プレイヤー (スクロールキャンセル対策版)
 struct FeedImageView: View {
     let url: URL
+    var contentMode: ContentMode = .fill
     
     @State private var uiImage: UIImage? = nil
     @State private var hasError: Bool = false
@@ -188,7 +186,7 @@ struct FeedImageView: View {
             if let uiImage = uiImage {
                 Image(uiImage: uiImage)
                     .resizable()
-                    .scaledToFill()
+                    .aspectRatio(contentMode: contentMode)
             } else if hasError {
                 Color.slateSurfaceVariant
                     .overlay(
