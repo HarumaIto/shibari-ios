@@ -27,6 +27,16 @@ class RootViewModel {
             Task {
                 self.currentUser = try? await userRepository.getUser(userId: uid)
                 self.isChecking = false
+                // 起動時に最新のFCMトークンをFirestoreに反映する
+                if let token = try? await authRepository.getFCMToken() {
+                    do {
+                        try await userRepository.updateFcmToken(userId: uid, fcmToken: token)
+                    } catch {
+                        print("FCMトークンのFirestore更新に失敗しました: \(error)")
+                    }
+                } else {
+                    print("FCMトークンの取得に失敗しました。")
+                }
             }
         } else {
             self.currentUser = nil
