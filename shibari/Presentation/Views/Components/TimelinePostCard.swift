@@ -158,7 +158,7 @@ struct TimelinePostCard: View {
             }
         }
         .sheet(isPresented: $showingComments) {
-            diContainer.makeCommentView(postId: post.id)
+            diContainer.makeCommentView(postId: post.id, currentUserId: currentUserId)
             .presentationDetents([.medium, .large])
             .presentationDragIndicator(.visible)
         }
