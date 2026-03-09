@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 
 @MainActor
 class AppDIContainer: ObservableObject {
@@ -13,13 +14,13 @@ class AppDIContainer: ObservableObject {
 
     // MARK: - Initializer
     init(
-        authRepository: AuthRepository = AuthRepositoryImpl(),
-        userRepository: UserRepository = UserRepositoryImpl(),
-        groupRepository: GroupRepository = GroupRepositoryImpl(),
-        timelineRepository: TimelineRepository = TimelineRepositoryImpl(),
-        reportRepository: ReportRepository = ReportRepositoryImpl(),
-        questRepository: QuestRepository = QuestRepositoryImpl(),
-        notificationRepository: NotificationRepository = NotificationRepositoryImpl()
+        authRepository: AuthRepository,
+        userRepository: UserRepository,
+        groupRepository: GroupRepository,
+        timelineRepository: TimelineRepository,
+        reportRepository: ReportRepository,
+        questRepository: QuestRepository,
+        notificationRepository: NotificationRepository
     ) {
         self.authRepository = authRepository
         self.userRepository = userRepository
@@ -28,6 +29,18 @@ class AppDIContainer: ObservableObject {
         self.reportRepository = reportRepository
         self.questRepository = questRepository
         self.notificationRepository = notificationRepository
+    }
+        
+    convenience init() {
+        self.init(
+            authRepository: AuthRepositoryImpl(),
+            userRepository: UserRepositoryImpl(),
+            groupRepository: GroupRepositoryImpl(),
+            timelineRepository: TimelineRepositoryImpl(),
+            reportRepository: ReportRepositoryImpl(),
+            questRepository: QuestRepositoryImpl(),
+            notificationRepository: NotificationRepositoryImpl()
+        )
     }
 
     // MARK: - Mock for Previews
@@ -219,7 +232,7 @@ class AppDIContainer: ObservableObject {
     }
 
     @ViewBuilder
-    func makeQuestFormView(groupId: String, initialQuest: QuestSnapshot?, onSaved: @escaping () -> Void) -> some View {
+    func makeQuestFormView(groupId: String, initialQuest: Quest?, onSaved: @escaping () -> Void) -> some View {
         QuestFormView(
             viewModel: QuestFormViewModel(
                 questRepository: questRepository,
@@ -241,13 +254,13 @@ class AppDIContainer: ObservableObject {
     }
 
     @ViewBuilder
-    func makeCommentView(postId: String) -> some View {
+    func makeCommentView(postId: String, currentUserId: String) -> some View {
         CommentView(
             viewModel: CommentViewModel(
                 postId: postId,
                 timelineRepository: timelineRepository,
                 userRepository: userRepository,
-                authRepository: authRepository
+                currentUserId: currentUserId
             )
         )
     }
