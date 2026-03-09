@@ -216,7 +216,8 @@ class AppDIContainer: ObservableObject {
             viewModel: GroupViewModel(
                 groupRepository: groupRepository,
                 authRepository: authRepository,
-                userRepository: userRepository
+                userRepository: userRepository,
+                questRepository: questRepository
             )
         )
     }

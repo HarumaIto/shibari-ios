@@ -230,7 +230,8 @@ struct GroupView: View {
         viewModel: GroupViewModel(
             groupRepository: GroupRepositoryMock(),
             authRepository: AuthRepositoryMock(),
-            userRepository: UserRepositoryMock()
+            userRepository: UserRepositoryMock(),
+            questRepository: QuestRepositoryMock()
         )
     )
     .environmentObject(AppDIContainer.mock)
