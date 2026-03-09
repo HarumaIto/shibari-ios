@@ -13,6 +13,8 @@ struct TimelinePost: Identifiable, Equatable {
     var approvalCount: Int = 0
     var votes: [String: VoteType] = [:]
     let status: PostStatus
+    var commentCount: Int = 0
+    var latestComments: [String] = []
     
     var createdAt: Date = Date()
 }
