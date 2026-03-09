@@ -172,9 +172,31 @@ struct GroupView: View {
                             .frame(width: 40, height: 40)
                             .overlay(Text(String(member.displayName.prefix(1))).foregroundColor(.white))
                         
-                        Text(member.displayName)
-                            .font(.body)
-                            .foregroundColor(.white)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(member.displayName)
+                                .font(.body)
+                                .foregroundColor(.white)
+                            
+                            
+                            if let firstQuestId = member.participatingQuestIds.first,
+                               let quest = viewModel.questDictionary[firstQuestId] {
+                                
+                                HStack(spacing: 4) {
+                                    Image(systemName: "flag.fill")
+                                        .font(.caption2)
+                                        .foregroundColor(.tacticalRed)
+                                    
+                                    Text(quest.title)
+                                        .font(.caption)
+                                        .foregroundColor(.textSecondary)
+                                        .lineLimit(1)
+                                }
+                            } else {
+                                Text("挑戦中の縛りなし")
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                            }
+                        }
                         
                         Spacer()
                         
@@ -208,7 +230,8 @@ struct GroupView: View {
         viewModel: GroupViewModel(
             groupRepository: GroupRepositoryMock(),
             authRepository: AuthRepositoryMock(),
-            userRepository: UserRepositoryMock()
+            userRepository: UserRepositoryMock(),
+            questRepository: QuestRepositoryMock()
         )
     )
     .environmentObject(AppDIContainer.mock)
