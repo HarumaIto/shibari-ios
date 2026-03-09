@@ -43,4 +43,5 @@ class UserRepositoryMock: UserRepository {
     func updateProfile(userId: String, displayName: String, photoData: Data?) async throws { }
     func blockUser(currentUserId: String, targetUserId: String) async throws { }
     func anonymizeUser(userId: String) async throws { }
+    func updateFcmToken(userId: String, fcmToken: String) async throws {}
 }

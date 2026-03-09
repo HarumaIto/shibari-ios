@@ -78,6 +78,12 @@ class UserRepositoryImpl: UserRepository {
         try await usersCollection.document(userId).updateData(data)
     }
     
+    func updateFcmToken(userId: String, fcmToken: String) async throws {
+        try await usersCollection.document(userId).updateData([
+            "fcmToken": fcmToken
+        ])
+    }
+    
     func blockUser(currentUserId: String, targetUserId: String) async throws {
         // Androidの FieldValue.arrayUnion に相当
         try await usersCollection.document(currentUserId).updateData([
