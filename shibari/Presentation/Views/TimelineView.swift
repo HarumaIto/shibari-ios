@@ -2,6 +2,7 @@ import SwiftUI
 
 struct TimelineView: View {
     @Bindable var viewModel: TimelineViewModel
+    @EnvironmentObject var diContainer: AppDIContainer
     
     var body: some View {
         ZStack {
@@ -50,28 +51,14 @@ struct TimelineView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
-                NavigationLink(
-                    destination: GroupView(
-                        viewModel: GroupViewModel(
-                            groupRepository: GroupRepositoryImpl(),
-                            authRepository: AuthRepositoryImpl(),
-                            userRepository: UserRepositoryImpl()
-                        ),
-                        questRepository: QuestRepositoryImpl()
-                    )) {
+                NavigationLink(destination: diContainer.makeGroupView()) {
                         Image(systemName: "person.2.fill")
                             .font(.system(size: 14))
                             .foregroundColor(.white)
                     }
             }
             ToolbarItem(placement: .topBarTrailing) {
-                NavigationLink(
-                    destination: NotificationsView(
-                        viewModel: NotificationsViewModel(
-                            notificationRepository: NotificationRepositoryImpl(),
-                            authRepository: AuthRepositoryImpl()
-                        )
-                    )) {
+                NavigationLink(destination: diContainer.makeNotificationsView()) {
                         Image(systemName: "bell.fill")
                             .font(.system(size: 14))
                             .foregroundColor(.white)
@@ -98,4 +85,5 @@ struct TimelineView: View {
             groupId: "mock_group_id_123"
         )
     )
+    .environmentObject(AppDIContainer.mock)
 }

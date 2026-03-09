@@ -11,10 +11,12 @@ import GoogleSignIn
 @main
 struct shibariApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+    @StateObject private var diContainer = AppDIContainer()
 
     var body: some Scene {
         WindowGroup {
-            RootView()
+            diContainer.makeRootView()
+                .environmentObject(diContainer)
                 .preferredColorScheme(.dark)
                 .tint(.tacticalRed)
                 .onOpenURL { url in

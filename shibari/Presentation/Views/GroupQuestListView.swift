@@ -4,6 +4,7 @@ struct GroupQuestListView: View {
     @Bindable var viewModel: GroupQuestListViewModel
     @State private var selectedQuest: Quest? = nil
     @State private var showingForm = false
+    @EnvironmentObject var diContainer: AppDIContainer
 
     var body: some View {
         ZStack {
@@ -53,12 +54,12 @@ struct GroupQuestListView: View {
             await viewModel.loadQuests()
         }
         .navigationDestination(isPresented: $showingForm) {
-            QuestFormView(
-                viewModel: QuestFormViewModel(
-                    questRepository: viewModel.questRepository,
-                    groupId: viewModel.groupId,
-                    initialQuest: selectedQuest
-                )
+            diContainer.makeQuestFormView(
+                groupId: viewModel.groupId,
+                initialQuest: selectedQuest,
+                onSaved: {
+                    showingForm = false
+                }
             )
         }
         .onChange(of: showingForm) { _, newValue in
@@ -125,4 +126,5 @@ fileprivate struct QuestListCardView: View {
             )
         )
     }
+    .environmentObject(AppDIContainer.mock)
 }

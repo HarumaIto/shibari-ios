@@ -116,3 +116,18 @@ struct QuestSelectionView: View {
         }
     }
 }
+
+#Preview {
+    NavigationStack {
+        QuestSelectionView(
+            viewModel: QuestSelectionViewModel(
+                questRepository: QuestRepositoryMock(),
+                userRepository: UserRepositoryMock(),
+                groupId: "mock_group_id",
+                currentUserId: "mock_user_1"
+            ),
+            onNavigateToMain: {}
+        )
+    }
+    .environmentObject(AppDIContainer.mock)
+}

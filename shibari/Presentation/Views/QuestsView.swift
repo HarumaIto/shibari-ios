@@ -154,4 +154,5 @@ fileprivate struct CardView: View {
         ),
         onNavigateToPost: {_ in }
     )
+    .environmentObject(AppDIContainer.mock)
 }

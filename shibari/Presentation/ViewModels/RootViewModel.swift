@@ -4,18 +4,31 @@ import Observation
 @MainActor
 @Observable
 class RootViewModel {
-    let authRepository: AuthRepository = AuthRepositoryImpl()
-    let userRepository: UserRepository = UserRepositoryImpl()
-    let groupRepository: GroupRepository = GroupRepositoryImpl()
-    let timelineRepository: TimelineRepository = TimelineRepositoryImpl()
-    let reportRepository: ReportRepository = ReportRepositoryImpl()
-    let questRepository: QuestRepository = QuestRepositoryImpl()
+    let authRepository: AuthRepository
+    let userRepository: UserRepository
+    let groupRepository: GroupRepository
+    let timelineRepository: TimelineRepository
+    let reportRepository: ReportRepository
+    let questRepository: QuestRepository
     
     var currentUserId: String? = nil
     var currentUser: User? = nil
     var isChecking: Bool = true // 初期ロード中フラグ
     
-    init() {
+    init(
+        authRepository: AuthRepository,
+        userRepository: UserRepository,
+        groupRepository: GroupRepository,
+        timelineRepository: TimelineRepository,
+        reportRepository: ReportRepository,
+        questRepository: QuestRepository
+    ) {
+        self.authRepository = authRepository
+        self.userRepository = userRepository
+        self.groupRepository = groupRepository
+        self.timelineRepository = timelineRepository
+        self.reportRepository = reportRepository
+        self.questRepository = questRepository
         checkAuthStatus()
     }
     

@@ -122,4 +122,5 @@ struct LoginView: View {
         ),
         onNavigateToNext: {}
     )
+        .environmentObject(AppDIContainer.mock)
 }
