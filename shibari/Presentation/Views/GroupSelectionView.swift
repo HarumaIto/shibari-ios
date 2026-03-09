@@ -105,3 +105,15 @@ struct GroupSelectionView: View {
         }
     }
 }
+
+#Preview {
+    GroupSelectionView(
+        viewModel: GroupSelectionViewModel(
+            groupRepository: GroupRepositoryMock(),
+            userRepository: UserRepositoryMock(),
+            currentUserId: "mock_user_1"
+        ),
+        onNavigateToNext: {}
+    )
+    .environmentObject(AppDIContainer.mock)
+}

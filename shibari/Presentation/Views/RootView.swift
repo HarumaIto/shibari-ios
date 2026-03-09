@@ -1,7 +1,8 @@
 import SwiftUI
 
 struct RootView: View {
-    @State private var viewModel = RootViewModel()
+    @State var viewModel: RootViewModel
+    @EnvironmentObject var diContainer: AppDIContainer
     
     var body: some View {
         ZStack {
@@ -13,60 +14,36 @@ struct RootView: View {
                 }
             } else if viewModel.currentUserId == nil {
                 // 1. 未ログイン ➔ 認証画面
-                AuthSelectionView(
-                    viewModel: AuthViewModel(
-                        authRepository: viewModel.authRepository,
-                        userRepository: viewModel.userRepository
-                    ),
-                    onNavigateToNext: { viewModel.checkAuthStatus() }
-                )
+                diContainer.makeAuthSelectionView(onNavigateToNext: { viewModel.checkAuthStatus() })
                 .onChange(of: viewModel.authRepository.getCurrentUserId()) { _, _ in viewModel.checkAuthStatus() }
                 
             } else if viewModel.currentUser == nil {
                 // 2. ログイン済みだがDBにプロフィールがない ➔ プロフィール登録画面
-                ProfileSetupView(
-                    viewModel: ProfileSetupViewModel(
-                        userRepository: viewModel.userRepository,
-                        authRepository: viewModel.authRepository,
-                        currentUserId: viewModel.currentUserId!
-                    ),
+                diContainer.makeProfileSetupView(
+                    currentUserId: viewModel.currentUserId!,
                     onNavigateToNext: { viewModel.checkAuthStatus() }
                 )
                 
             } else if viewModel.currentUser?.groupId == nil {
                 // 3. プロフィールはあるがグループ未所属 ➔ グループ選択画面
-                GroupSelectionView(
-                    viewModel: GroupSelectionViewModel(
-                        groupRepository: viewModel.groupRepository,
-                        userRepository: viewModel.userRepository,
-                        currentUserId: viewModel.currentUserId!
-                    ),
+                diContainer.makeGroupSelectionView(
+                    currentUserId: viewModel.currentUserId!,
                     onNavigateToNext: { viewModel.checkAuthStatus() }
                 )
                 
             } else if viewModel.currentUser?.participatingQuestIds.isEmpty ?? true {
                 // 4. グループ所属済みだが、縛りが未選択 ➔ 縛り選択画面
-                QuestSelectionView(
-                    viewModel: QuestSelectionViewModel(
-                        questRepository: viewModel.questRepository,
-                        userRepository: viewModel.userRepository,
-                        groupId: viewModel.currentUser!.groupId!,
-                        currentUserId: viewModel.currentUserId!
-                    ),
+                diContainer.makeQuestSelectionView(
+                    groupId: viewModel.currentUser!.groupId!,
+                    currentUserId: viewModel.currentUserId!,
                     onNavigateToMain: { viewModel.checkAuthStatus() }
                 )
                 
             } else {
                 // 5. すべて完了 ➔ メインのタブバー画面
-                MainTabView(
+                diContainer.makeMainTabView(
                     currentUserId: viewModel.currentUserId!,
                     groupId: viewModel.currentUser!.groupId!,
-                    timelineRepository: viewModel.timelineRepository,
-                    userRepository: viewModel.userRepository,
-                    reportRepository: viewModel.reportRepository,
-                    authRepository: viewModel.authRepository,
-                    questRepository: viewModel.questRepository,
-                    groupRepository: viewModel.groupRepository,
                     onLogoutRequest: {
                         viewModel.checkAuthStatus()
                     }

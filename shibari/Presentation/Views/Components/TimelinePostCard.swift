@@ -12,6 +12,7 @@ struct TimelinePostCard: View {
     @State private var showingReportAlert = false
     @State private var reportReason = ""
     @State private var showingComments = false
+    @EnvironmentObject var diContainer: AppDIContainer
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -35,6 +36,9 @@ struct TimelinePostCard: View {
                     Text("クエスト: \(post.quest.title)")
                         .font(.caption)
                         .foregroundColor(.achievementGold)
+                    Text(post.createdAt.formatted(date: .numeric, time: .shortened))
+                        .font(.caption2)
+                        .foregroundColor(.textSecondary)
                 }
                 
                 Spacer()
@@ -69,19 +73,16 @@ struct TimelinePostCard: View {
             
             // --- 2. 証拠画像 ---
             if let mediaUrl = URL(string: post.mediaUrl) {
-                Rectangle()
-                    .fill(Color.black)
-                    .aspectRatio(1.0, contentMode: .fit) // 幅に合わせて完璧な正方形にする
-                    .overlay(
-                        SwiftUI.Group {
-                            if post.mediaType == .video {
-                                FeedVideoPlayer(url: mediaUrl)
-                            } else {
-                                FeedImageView(url: mediaUrl)
-                            }
-                        }
-                    )
-                    .clipped()
+                SwiftUI.Group {
+                    if post.mediaType == .video {
+                        FeedVideoPlayer(url: mediaUrl)
+                    } else {
+                        FeedImageView(url: mediaUrl, contentMode: .fit)
+                    }
+                }
+                .frame(maxWidth: .infinity, maxHeight: 500)
+                .background(Color.slateSurfaceVariant)
+                .clipped()
             }
             
             // --- 3. コメントと投票エリア ---
@@ -157,14 +158,7 @@ struct TimelinePostCard: View {
             }
         }
         .sheet(isPresented: $showingComments) {
-            CommentView(
-                viewModel: CommentViewModel(
-                    postId: post.id,
-                    timelineRepository: TimelineRepositoryImpl(), // 簡易生成
-                    userRepository: UserRepositoryImpl(),       // 簡易生成
-                    currentUserId: currentUserId
-                )
-            )
+            diContainer.makeCommentView(postId: post.id, currentUserId: currentUserId)
             .presentationDetents([.medium, .large])
             .presentationDragIndicator(.visible)
         }
@@ -185,16 +179,19 @@ struct TimelinePostCard: View {
 // MARK: - タイムライン専用 画像プレイヤー (スクロールキャンセル対策版)
 struct FeedImageView: View {
     let url: URL
+    var contentMode: ContentMode = .fill
     
     @State private var uiImage: UIImage? = nil
     @State private var hasError: Bool = false
     
     var body: some View {
         ZStack {
+            Color.slateSurfaceVariant
+            
             if let uiImage = uiImage {
                 Image(uiImage: uiImage)
                     .resizable()
-                    .scaledToFill()
+                    .aspectRatio(contentMode: contentMode)
             } else if hasError {
                 Color.slateSurfaceVariant
                     .overlay(
@@ -204,8 +201,9 @@ struct FeedImageView: View {
                         }
                     )
             } else {
-                Color.slateSurfaceVariant
-                    .overlay(ProgressView().progressViewStyle(CircularProgressViewStyle(tint: .tacticalRed)))
+                ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle(tint: .tacticalRed))
+                    .frame(height: 500)
             }
         }
         .onAppear {
@@ -244,27 +242,49 @@ struct FeedVideoPlayer: View {
     let url: URL
     // プレイヤーを状態として保持し、再描画時のチラつきを防ぐ
     @State private var player: AVPlayer?
+    @State private var videoAspectRatio: CGFloat? = nil
     
     var body: some View {
         ZStack {
             // 動画の黒帯部分の背景
-            Color.black
-            
+            Color.slateSurfaceVariant
+
             if let player = player {
                 // iOS標準の動画プレイヤー（再生/一時停止などのコントロール付き）
                 VideoPlayer(player: player)
             } else {
                 // プレイヤーの準備ができるまでのローディング
+                
                 ProgressView()
                     .progressViewStyle(CircularProgressViewStyle(tint: .tacticalRed))
+                    .frame(height: 500)
             }
         }
+        .aspectRatio(videoAspectRatio ?? 1.0, contentMode: .fit)
         .onAppear {
             // 画面に表示されたらプレイヤーを生成して自動再生
             if player == nil {
                 let newPlayer = AVPlayer(url: url)
                 self.player = newPlayer
                 newPlayer.play()
+
+                // 動画本来のサイズ（アスペクト比）を取得してUIの極端な縮小を防ぐ
+                Task {
+                    let asset = AVURLAsset(url: url)
+                    if let track = try? await asset.loadTracks(withMediaType: .video).first {
+                        let size = try? await track.load(.naturalSize)
+                        let transform = try? await track.load(.preferredTransform)
+
+                        if let size = size, let transform = transform {
+                            let transformedSize = size.applying(transform)
+                            let ratio = abs(transformedSize.width / transformedSize.height)
+                            // メインスレッドでアスペクト比を更新
+                            await MainActor.run {
+                                self.videoAspectRatio = ratio
+                            }
+                        }
+                    }
+                }
             } else {
                 // すでにプレイヤーがある場合は再生を再開
                 player?.play()
