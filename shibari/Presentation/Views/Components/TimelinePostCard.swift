@@ -80,7 +80,7 @@ struct TimelinePostCard: View {
                         FeedImageView(url: mediaUrl, contentMode: .fit)
                     }
                 }
-                .frame(maxWidth: .infinity, maxHeight: 500)
+                .frame(maxWidth: .infinity)
                 .background(Color.slateSurfaceVariant)
                 .clipped()
             }
