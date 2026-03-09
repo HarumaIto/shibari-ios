@@ -178,23 +178,22 @@ struct GroupView: View {
                                 .foregroundColor(.white)
                             
                             
-                            if let firstQuestId = member.participatingQuestIds.first,
-                               let quest = viewModel.questDictionary[firstQuestId] {
-                                
+                            if member.participatingQuestIds.isEmpty {
+                                Text("挑戦中の縛りなし")
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                            } else {
                                 HStack(spacing: 4) {
                                     Image(systemName: "flag.fill")
                                         .font(.caption2)
                                         .foregroundColor(.tacticalRed)
                                     
-                                    Text(quest.title)
+                                    Text(viewModel.getQuestTitles(member: member))
                                         .font(.caption)
                                         .foregroundColor(.textSecondary)
                                         .lineLimit(1)
                                 }
-                            } else {
-                                Text("挑戦中の縛りなし")
-                                    .font(.caption)
-                                    .foregroundColor(.gray)
+                                
                             }
                         }
                         

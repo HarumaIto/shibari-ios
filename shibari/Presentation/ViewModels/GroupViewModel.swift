@@ -62,4 +62,23 @@ class GroupViewModel {
             errorMessage = "データの読み込みに失敗しました"
         }
     }
+    
+    func getQuestTitles(member: User) -> String {
+        if member.participatingQuestIds.isEmpty {
+            return "挑戦中の縛りなし"
+        }
+        let firstId = member.participatingQuestIds.first!
+        guard let firstQuest = questDictionary[firstId] else {
+            return "挑戦中の縛りが見つかりません"
+        }
+        var questTitles = firstQuest.title
+        for id in member.participatingQuestIds {
+            if id == firstId {
+                continue
+            }
+            let quest = questDictionary[id]
+            questTitles += ", \(quest?.title ?? "Not found")"
+        }
+        return questTitles
+    }
 }
