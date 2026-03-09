@@ -36,6 +36,9 @@ struct TimelinePostCard: View {
                     Text("クエスト: \(post.quest.title)")
                         .font(.caption)
                         .foregroundColor(.achievementGold)
+                    Text(post.createdAt.formatted(date: .numeric, time: .shortened))
+                        .font(.caption2)
+                        .foregroundColor(.textSecondary)
                 }
                 
                 Spacer()
