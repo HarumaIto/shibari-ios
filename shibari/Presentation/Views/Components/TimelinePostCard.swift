@@ -80,7 +80,7 @@ struct TimelinePostCard: View {
                         FeedImageView(url: mediaUrl, contentMode: .fit)
                     }
                 }
-                .frame(maxWidth: .infinity)
+                .frame(maxWidth: .infinity, maxHeight: 500)
                 .background(Color.slateSurfaceVariant)
                 .clipped()
             }
@@ -239,6 +239,7 @@ struct FeedVideoPlayer: View {
     let url: URL
     // プレイヤーを状態として保持し、再描画時のチラつきを防ぐ
     @State private var player: AVPlayer?
+    @State private var videoAspectRatio: CGFloat? = nil
     
     var body: some View {
         ZStack {
@@ -254,12 +255,31 @@ struct FeedVideoPlayer: View {
                     .progressViewStyle(CircularProgressViewStyle(tint: .tacticalRed))
             }
         }
+        .aspectRatio(videoAspectRatio ?? 1.0, contentMode: .fit)
         .onAppear {
             // 画面に表示されたらプレイヤーを生成して自動再生
             if player == nil {
                 let newPlayer = AVPlayer(url: url)
                 self.player = newPlayer
                 newPlayer.play()
+
+                // 動画本来のサイズ（アスペクト比）を取得してUIの極端な縮小を防ぐ
+                Task {
+                    let asset = AVURLAsset(url: url)
+                    if let track = try? await asset.loadTracks(withMediaType: .video).first {
+                        let size = try? await track.load(.naturalSize)
+                        let transform = try? await track.load(.preferredTransform)
+
+                        if let size = size, let transform = transform {
+                            let transformedSize = size.applying(transform)
+                            let ratio = abs(transformedSize.width / transformedSize.height)
+                            // メインスレッドでアスペクト比を更新
+                            await MainActor.run {
+                                self.videoAspectRatio = ratio
+                            }
+                        }
+                    }
+                }
             } else {
                 // すでにプレイヤーがある場合は再生を再開
                 player?.play()
