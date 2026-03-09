@@ -93,22 +93,43 @@ struct TimelinePostCard: View {
                         .font(.body)
                 }
                 
+                if !post.latestComments.isEmpty {
+                    VStack(alignment: .leading, spacing: 4) {
+                        ForEach(post.latestComments.reversed(), id: \.self) { commentText in
+                            Text(commentText)
+                                .font(.subheadline)
+                                .foregroundColor(.white.opacity(0.8))
+                                .lineLimit(1)
+                        }
+                    }
+                }
+                
                 // 投票ボタン（承認 / 否認）
                 HStack(spacing: 12) {
                     Button(action: {
                         showingComments = true
                     }) {
-                        Image(systemName: "message")
-                            .font(.system(size: 20))
-                            .foregroundColor(.textSecondary)
-                            .padding(.vertical, 12)
-                            .padding(.horizontal, 16)
-                            .background(Color.clear)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .stroke(Color.slateSurfaceVariant, lineWidth: 1)
-                            )
+                        HStack(spacing: 6) {
+                            Image(systemName: "message")
+                                .font(.system(size: 20))
+                            
+                            if post.commentCount > 0 {
+                                Text("\(post.commentCount)")
+                                    .font(.subheadline)
+                                    .fontWeight(.bold)
+                            }
+                        }
+                        // コメントがある場合は白（目立たせる）、ない場合はグレー
+                        .foregroundColor(post.commentCount > 0 ? .white : .textSecondary)
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 16)
+                        .background(Color.clear)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(Color.slateSurfaceVariant, lineWidth: 1)
+                        )
                     }
+                    
                     // 否認ボタン（タクティカルレッド）
                     Button(action: { onVote(.REJECT) }) {
                         HStack {
@@ -296,3 +317,5 @@ struct FeedVideoPlayer: View {
         }
     }
 }
+
+

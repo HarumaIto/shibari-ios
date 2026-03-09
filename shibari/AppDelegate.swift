@@ -36,6 +36,18 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     // FCMトークンが新しく生成・更新された時に呼ばれる
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
         print("FCMトークンが更新されました: \(String(describing: fcmToken))")
-        // （※ここで最新のトークンをFirestoreに保存し直す処理を入れるとさらに堅牢になります）
+        guard let token = fcmToken else { return }
+        
+        let authRepository: AuthRepository = AuthRepositoryImpl()
+        guard let userId = authRepository.getCurrentUserId() else { return }
+        
+        let userRepository: UserRepository = UserRepositoryImpl()
+        Task {
+            do {
+                try await userRepository.updateFcmToken(userId: userId, fcmToken: token)
+            } catch {
+                print("FCMトークンのFirestore更新に失敗しました: \(error)")
+            }
+        }
     }
 }
