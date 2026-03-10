@@ -3,6 +3,7 @@ import SwiftUI
 struct ProfileView: View {
     @Bindable var viewModel: ProfileViewModel
     var onLogout: () -> Void // ルート画面へ戻るためのコールバック
+    @EnvironmentObject var diContainer: AppDIContainer
     
     @State private var showingLogoutAlert = false
     @State private var showingDeleteAlert = false
@@ -223,24 +224,15 @@ struct ProfileView: View {
             }
         }
         .navigationDestination(isPresented: $showingEditProfile) {
-            ProfileEditView(
-                viewModel: ProfileEditViewModel(
-                    userRepository: UserRepositoryImpl(),
-                    currentUserId: viewModel.currentUser?.id ?? ""
-                )
-            )
+            diContainer.makeProfileEditView(currentUserId: viewModel.currentUser?.id ?? "")
         }
         .onChange(of: showingEditProfile) { _, newValue in
             if newValue == false { reloadProfileIfNeeded() }
         }
         .navigationDestination(isPresented: $showingQuestsProfile) {
-            QuestSelectionView(
-                viewModel: QuestSelectionViewModel(
-                    questRepository: QuestRepositoryImpl(),
-                    userRepository: UserRepositoryImpl(),
-                    groupId: viewModel.currentGroup?.id ?? "",
-                    currentUserId: viewModel.currentUser?.id ?? ""
-                ),
+            diContainer.makeQuestSelectionView(
+                groupId: viewModel.currentGroup?.id ?? "",
+                currentUserId: viewModel.currentUser?.id ?? "",
                 onNavigateToMain: {
                     showingQuestsProfile = false
                 }
@@ -278,4 +270,5 @@ struct ProfileView: View {
         ),
         onLogout: {}
     )
+    .environmentObject(AppDIContainer.mock)
 }

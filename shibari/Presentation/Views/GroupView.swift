@@ -2,7 +2,7 @@ import SwiftUI
 
 struct GroupView: View {
     @Bindable var viewModel: GroupViewModel
-    let questRepository: QuestRepository
+    @EnvironmentObject var diContainer: AppDIContainer
 
     @State private var showCopyToast = false
     
@@ -72,12 +72,7 @@ struct GroupView: View {
     }
     
     private var questsNavigationSection: some View {
-        NavigationLink(destination: GroupQuestListView(
-            viewModel: GroupQuestListViewModel(
-                questRepository: questRepository,
-                groupId: viewModel.group!.id
-            )
-        )) {
+        NavigationLink(destination: diContainer.makeGroupQuestListView(groupId: viewModel.group!.id)) {
             HStack(spacing: 16) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 8)
@@ -177,9 +172,30 @@ struct GroupView: View {
                             .frame(width: 40, height: 40)
                             .overlay(Text(String(member.displayName.prefix(1))).foregroundColor(.white))
                         
-                        Text(member.displayName)
-                            .font(.body)
-                            .foregroundColor(.white)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(member.displayName)
+                                .font(.body)
+                                .foregroundColor(.white)
+                            
+                            
+                            if member.participatingQuestIds.isEmpty {
+                                Text("挑戦中の縛りなし")
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                            } else {
+                                HStack(spacing: 4) {
+                                    Image(systemName: "flag.fill")
+                                        .font(.caption2)
+                                        .foregroundColor(.tacticalRed)
+                                    
+                                    Text(viewModel.getQuestTitles(member: member))
+                                        .font(.caption)
+                                        .foregroundColor(.textSecondary)
+                                        .lineLimit(1)
+                                }
+                                
+                            }
+                        }
                         
                         Spacer()
                         
@@ -213,8 +229,9 @@ struct GroupView: View {
         viewModel: GroupViewModel(
             groupRepository: GroupRepositoryMock(),
             authRepository: AuthRepositoryMock(),
-            userRepository: UserRepositoryMock()
-        ),
-        questRepository: QuestRepositoryMock()
+            userRepository: UserRepositoryMock(),
+            questRepository: QuestRepositoryMock()
+        )
     )
+    .environmentObject(AppDIContainer.mock)
 }

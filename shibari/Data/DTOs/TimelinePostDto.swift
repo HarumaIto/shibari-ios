@@ -18,6 +18,9 @@ struct TimelinePostDto: Codable {
     var votes: [String: String]
     var status: String
     
+    var commentCount: Int
+    var latestComments: [String]
+    
     @ServerTimestamp var createdAt: Timestamp?
     
     func toDomain() -> TimelinePost {
@@ -35,8 +38,10 @@ struct TimelinePostDto: Codable {
             approvalCount: approvalCount,
             votes: votes.compactMapValues { VoteType(rawValue: $0) },
             status: PostStatus(rawValue: status) ?? .pending,
+            commentCount: commentCount,
+            latestComments: latestComments,
             // TimestampをDateに変換。nilの場合は現在時刻をフォールバック
-            createdAt: createdAt?.dateValue() ?? Date()
+            createdAt: createdAt?.dateValue() ?? Date(),
         )
     }
     
@@ -57,6 +62,8 @@ struct TimelinePostDto: Codable {
             // Dictionaryの中のEnumも一括で変換
             votes: domain.votes.mapValues { $0.rawValue },
             status: domain.status.rawValue,
+            commentCount: domain.commentCount,
+            latestComments: domain.latestComments,
             // Date型をFirestore用のTimestamp型に変換
             createdAt: Timestamp(date: domain.createdAt),
         )

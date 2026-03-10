@@ -157,4 +157,5 @@ struct SignUpView: View {
         ),
         onNavigateToNext: {}
     )
+        .environmentObject(AppDIContainer.mock)
 }

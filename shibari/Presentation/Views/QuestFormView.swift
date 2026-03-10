@@ -3,6 +3,7 @@ import SwiftUI
 struct QuestFormView: View {
     @Bindable var viewModel: QuestFormViewModel
     @Environment(\.dismiss) private var dismiss
+    var onSaved: (() -> Void)? = nil
 
     var body: some View {
         ZStack {
@@ -95,7 +96,10 @@ struct QuestFormView: View {
             }
         }
         .onChange(of: viewModel.isSaved) { _, newValue in
-            if newValue { dismiss() }
+            if newValue {
+                onSaved?()
+                dismiss()
+            }
         }
         .alert("エラー", isPresented: Binding<Bool>(
             get: { viewModel.errorMessage != nil },
@@ -120,4 +124,5 @@ struct QuestFormView: View {
             )
         )
     }
+    .environmentObject(AppDIContainer.mock)
 }

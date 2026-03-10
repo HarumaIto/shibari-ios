@@ -131,7 +131,7 @@ struct PostView: View {
                 // 画像プレビュー
                 Image(uiImage: uiImage)
                     .resizable()
-                    .scaledToFill()
+                    .scaledToFit()
             }
         } else {
             // 未選択状態
