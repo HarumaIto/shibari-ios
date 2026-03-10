@@ -34,14 +34,16 @@ class QuestSelectionViewModel {
             var fetchedQuests = try await questRepository.getGroupQuests(groupId: groupId)
             
             if fetchedQuests.isEmpty {
-                let sampleQuests = [
-                    Quest(id: UUID().uuidString, groupId: groupId, title: "1日1回プロテイン", type: .ROUTINE, frequency: .DAILY, description: "健康のために毎日プロテインを飲む", threshold: 1, isCompleted: false),
-                    Quest(id: UUID().uuidString, groupId: groupId, title: "24時までに寝る", type: .ROUTINE, frequency: .DAILY, description: "睡眠時間をしっかり確保する", threshold: 1, isCompleted: false),
-                    Quest(id: UUID().uuidString, groupId: groupId, title: "週3回運動する", type: .ROUTINE, frequency: .WEEKLY, description: "ランニングや筋トレなど", threshold: 3, isCompleted: false)
+                var sampleQuests = [
+                    Quest(groupId: groupId, title: "1日1回プロテイン", type: .ROUTINE, frequency: .DAILY, description: "健康のために毎日プロテインを飲む", threshold: 1, isCompleted: false),
+                    Quest(groupId: groupId, title: "24時までに寝る", type: .ROUTINE, frequency: .DAILY, description: "睡眠時間をしっかり確保する", threshold: 1, isCompleted: false),
+                    Quest(groupId: groupId, title: "週3回運動する", type: .ROUTINE, frequency: .WEEKLY, description: "ランニングや筋トレなど", threshold: 3, isCompleted: false)
                 ]
                 
-                for quest in sampleQuests {
-                    try await questRepository.createQuest(quest: quest)
+                for i in 0..<sampleQuests.count {
+                    let quest = sampleQuests[i]
+                    let newId = try await questRepository.createQuest(quest: quest)
+                    sampleQuests[i].id = newId
                 }
                 fetchedQuests = sampleQuests
             }
