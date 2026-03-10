@@ -82,7 +82,7 @@ class QuestSelectionViewModel {
         do {
             self.quests = try await questRepository.getGroupQuests(groupId: groupId)
         } catch {
-            print("クエストの再読み込みに失敗しました: \(error)")
+            self.errorMessage = "クエストの再読み込みに失敗しました: \(error)"
         }
     }
 }
