@@ -6,7 +6,7 @@ import Observation
 class QuestSelectionViewModel {
     private let questRepository: QuestRepository
     private let userRepository: UserRepository
-    private let groupId: String
+    let groupId: String
     private let currentUserId: String
     
     var quests: [Quest] = []
@@ -31,7 +31,25 @@ class QuestSelectionViewModel {
     private func loadQuests() async {
         isLoading = true
         do {
-            self.quests = try await questRepository.getGroupQuests(groupId: groupId)
+            var fetchedQuests = try await questRepository.getGroupQuests(groupId: groupId)
+            
+            if fetchedQuests.isEmpty {
+                var sampleQuests = [
+                    Quest(groupId: groupId, title: "1日1回プロテイン", type: .ROUTINE, frequency: .DAILY, description: "健康のために毎日プロテインを飲む", threshold: 1, isCompleted: false),
+                    Quest(groupId: groupId, title: "24時までに寝る", type: .ROUTINE, frequency: .DAILY, description: "睡眠時間をしっかり確保する", threshold: 1, isCompleted: false),
+                    Quest(groupId: groupId, title: "週3回運動する", type: .ROUTINE, frequency: .WEEKLY, description: "ランニングや筋トレなど", threshold: 3, isCompleted: false)
+                ]
+                
+                for i in 0..<sampleQuests.count {
+                    let quest = sampleQuests[i]
+                    let newId = try await questRepository.createQuest(quest: quest)
+                    sampleQuests[i].id = newId
+                }
+                fetchedQuests = sampleQuests
+            }
+                            
+            self.quests = fetchedQuests
+            
             if let user = try await userRepository.getUser(userId: currentUserId) {
                 self.selectedQuestIds = Set(user.participatingQuestIds)
             }
@@ -58,5 +76,13 @@ class QuestSelectionViewModel {
             self.errorMessage = "保存に失敗しました"
         }
         isLoading = false
+    }
+    
+    func refreshQuests() async {
+        do {
+            self.quests = try await questRepository.getGroupQuests(groupId: groupId)
+        } catch {
+            self.errorMessage = "クエストの再読み込みに失敗しました: \(error)"
+        }
     }
 }
