@@ -3,7 +3,6 @@ import SwiftUI
 struct QuestFormView: View {
     @Bindable var viewModel: QuestFormViewModel
     @Environment(\.dismiss) private var dismiss
-    @FocusState private var focusedField: Field?
     var onSaved: (() -> Void)? = nil
 
     private enum Field {
@@ -28,7 +27,6 @@ struct QuestFormView: View {
                                 .font(.caption)
                                 .foregroundColor(.textSecondary)
                             TextField("縛りのタイトルを入力", text: $viewModel.title)
-                                .focused($focusedField, equals: .title)
                                 .padding()
                                 .background(Color.slateSurface)
                                 .cornerRadius(8)
@@ -41,7 +39,6 @@ struct QuestFormView: View {
                                 .font(.caption)
                                 .foregroundColor(.textSecondary)
                             TextField("縛りの詳細や条件を入力", text: $viewModel.description, axis: .vertical)
-                                .focused($focusedField, equals: .description)
                                 .lineLimit(3...6)
                                 .padding()
                                 .background(Color.slateSurface)
@@ -81,7 +78,6 @@ struct QuestFormView: View {
                                 .font(.caption)
                                 .foregroundColor(.textSecondary)
                             TextField("例: 5", text: $viewModel.thresholdText)
-                                .focused($focusedField, equals: .threshold)
                                 .keyboardType(.numberPad)
                                 .padding()
                                 .background(Color.slateSurface)
@@ -119,14 +115,6 @@ struct QuestFormView: View {
         }
         .navigationTitle(viewModel.isNewQuest ? "新しい縛りを作成" : "縛りを編集")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItemGroup(placement: .keyboard) {
-                Spacer()
-                Button("完了") {
-                    focusedField = nil
-                }
-            }
-        }
         .onChange(of: viewModel.isSaved) { _, newValue in
             if newValue {
                 onSaved?()
