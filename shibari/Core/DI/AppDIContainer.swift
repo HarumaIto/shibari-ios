@@ -150,25 +150,32 @@ class AppDIContainer: ObservableObject {
         )
     }
 
+    func makeQuestsViewModel() -> QuestsViewModel {
+        QuestsViewModel(
+            authRepository: authRepository,
+            userRepository: userRepository,
+            questRepository: questRepository
+        )
+    }
+
+    func makeProfileViewModel() -> ProfileViewModel {
+        ProfileViewModel(
+            authRepository: authRepository,
+            userRepository: userRepository,
+            groupRepository: groupRepository,
+            questRepository: questRepository
+        )
+    }
+
     @ViewBuilder
     func makeMainTabView(currentUserId: String, groupId: String, onLogoutRequest: @escaping () -> Void) -> some View {
         MainTabView(
             currentUserId: currentUserId,
             groupId: groupId,
             timelineViewModel: makeTimelineViewModel(currentUserId: currentUserId, groupId: groupId),
+            questsViewModel: makeQuestsViewModel(),
+            profileViewModel: makeProfileViewModel(),
             onLogoutRequest: onLogoutRequest
-        )
-    }
-
-    @ViewBuilder
-    func makeQuestsView(onNavigateToPost: @escaping (String) -> Void) -> some View {
-        QuestsView(
-            viewModel: QuestsViewModel(
-                authRepository: authRepository,
-                userRepository: userRepository,
-                questRepository: questRepository
-            ),
-            onNavigateToPost: onNavigateToPost
         )
     }
 
@@ -182,19 +189,6 @@ class AppDIContainer: ObservableObject {
                 userRepository: userRepository,
                 questRepository: questRepository
             )
-        )
-    }
-
-    @ViewBuilder
-    func makeProfileView(onLogout: @escaping () -> Void) -> some View {
-        ProfileView(
-            viewModel: ProfileViewModel(
-                authRepository: authRepository,
-                userRepository: userRepository,
-                groupRepository: groupRepository,
-                questRepository: questRepository
-            ),
-            onLogout: onLogout
         )
     }
 
