@@ -18,8 +18,8 @@ struct TimelinePostDto: Codable {
     var votes: [String: String]
     var status: String
     
-    var commentCount: Int
-    var latestComments: [String]
+    var commentCount: Int?
+    var latestComments: [String]?
     
     @ServerTimestamp var createdAt: Timestamp?
     
@@ -38,8 +38,8 @@ struct TimelinePostDto: Codable {
             approvalCount: approvalCount,
             votes: votes.compactMapValues { VoteType(rawValue: $0) },
             status: PostStatus(rawValue: status) ?? .pending,
-            commentCount: commentCount,
-            latestComments: latestComments,
+            commentCount: commentCount ?? 0,
+            latestComments: latestComments ?? [],
             // TimestampをDateに変換。nilの場合は現在時刻をフォールバック
             createdAt: createdAt?.dateValue() ?? Date(),
         )

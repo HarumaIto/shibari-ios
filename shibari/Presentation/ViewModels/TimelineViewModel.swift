@@ -59,6 +59,17 @@ class TimelineViewModel {
             }
         }
     }
+
+    // 引っ張って更新用: 再接続してデータが届くまで待機する
+    func restartObserving() async {
+        let refreshTimeout: TimeInterval = 3.0
+        startObserving()
+        // ローディングが完了するまで待機（最大 refreshTimeout 秒）
+        let deadline = Date.now.addingTimeInterval(refreshTimeout)
+        while isLoading && Date.now < deadline {
+            try? await Task.sleep(for: .milliseconds(100))
+        }
+    }
         
     func stopObserving() {
         timelineTask?.cancel()
