@@ -166,11 +166,16 @@ struct GroupView: View {
             LazyVStack(spacing: 0) {
                 ForEach(viewModel.members) { member in
                     HStack(spacing: 16) {
-                        // アイコン（モック）
-                        Circle()
-                            .fill(Color.gray)
-                            .frame(width: 40, height: 40)
-                            .overlay(Text(String(member.displayName.prefix(1))).foregroundColor(.white))
+                        if let photoUrl = member.photoUrl, let url = URL(string: photoUrl) {
+                            FeedImageView(url: url)
+                                .frame(width: 40, height: 40)
+                                .clipShape(Circle())
+                        } else {
+                            FallbackIcon(
+                                name: member.displayName,
+                                size: 40
+                            )
+                        }
                         
                         VStack(alignment: .leading, spacing: 4) {
                             Text(member.displayName)

@@ -1,7 +1,7 @@
 import Foundation
 
 struct Quest: Identifiable, Equatable {
-    let id: String
+    var id: String = ""
     let groupId: String
     let title: String
     let type: QuestType

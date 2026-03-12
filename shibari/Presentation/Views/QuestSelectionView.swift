@@ -4,6 +4,9 @@ struct QuestSelectionView: View {
     @Bindable var viewModel: QuestSelectionViewModel
     var onNavigateToMain: () -> Void
     
+    @State private var showingQuestForm = false
+    @EnvironmentObject var diContainer: AppDIContainer
+
     var body: some View {
         ZStack {
             Color.slateBackground.ignoresSafeArea()
@@ -69,6 +72,36 @@ struct QuestSelectionView: View {
                                 }
                                 .buttonStyle(PlainButtonStyle())
                             }
+                            
+                            Button(action: {
+                                showingQuestForm = true
+                            }) {
+                                HStack(spacing: 16) {
+                                    Image(systemName: "plus.circle.fill")
+                                        .foregroundColor(.tacticalRed)
+                                        .font(.system(size: 24))
+                                    
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text("オリジナルの縛りを作る")
+                                            .font(.headline)
+                                            .foregroundColor(.tacticalRed)
+                                        Text("自分たちだけのルールを追加できます")
+                                            .font(.caption)
+                                            .foregroundColor(.textSecondary)
+                                    }
+                                    Spacer()
+                                }
+                                .padding(16)
+                                .background(Color.tacticalRed.opacity(0.1))
+                                .cornerRadius(8)
+                                .overlay(
+                                    // 破線（ダッシュ線）にして「追加枠」っぽさを出す
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .stroke(Color.tacticalRed.opacity(0.5), style: StrokeStyle(lineWidth: 1, dash: [5]))
+                                )
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                            .padding(.top, 8)
                         }
                         .padding(.horizontal, 16)
                     }
@@ -113,6 +146,17 @@ struct QuestSelectionView: View {
             if let errorMessage = viewModel.errorMessage {
                 Text(errorMessage)
             }
+        }
+        .sheet(isPresented: $showingQuestForm, onDismiss: {
+            Task { await viewModel.refreshQuests() }
+        }) {
+            diContainer.makeQuestFormView(
+                groupId: viewModel.groupId,
+                initialQuest: nil,
+                onSaved: {
+                    showingQuestForm = false
+                }
+            )
         }
     }
 }

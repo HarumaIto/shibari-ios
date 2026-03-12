@@ -69,7 +69,6 @@ class QuestFormViewModel {
                 try await questRepository.updateQuest(quest: updated)
             } else {
                 let newQuest = Quest(
-                    id: "",
                     groupId: groupId,
                     title: title,
                     type: type,
