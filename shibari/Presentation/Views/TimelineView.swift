@@ -43,7 +43,7 @@ struct TimelineView: View {
                 }
                 // iOS15以降の引っ張って更新
                 .refreshable {
-                    viewModel.startObserving()
+                    await viewModel.restartObserving()
                 }
             }
         }

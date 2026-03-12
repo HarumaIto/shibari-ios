@@ -140,25 +140,23 @@ class AppDIContainer: ObservableObject {
         )
     }
 
+    func makeTimelineViewModel(currentUserId: String, groupId: String) -> TimelineViewModel {
+        TimelineViewModel(
+            timelineRepository: timelineRepository,
+            userRepository: userRepository,
+            reportRepository: reportRepository,
+            currentUserId: currentUserId,
+            groupId: groupId
+        )
+    }
+
     @ViewBuilder
     func makeMainTabView(currentUserId: String, groupId: String, onLogoutRequest: @escaping () -> Void) -> some View {
         MainTabView(
             currentUserId: currentUserId,
             groupId: groupId,
+            timelineViewModel: makeTimelineViewModel(currentUserId: currentUserId, groupId: groupId),
             onLogoutRequest: onLogoutRequest
-        )
-    }
-
-    @ViewBuilder
-    func makeTimelineView(currentUserId: String, groupId: String) -> some View {
-        TimelineView(
-            viewModel: TimelineViewModel(
-                timelineRepository: timelineRepository,
-                userRepository: userRepository,
-                reportRepository: reportRepository,
-                currentUserId: currentUserId,
-                groupId: groupId
-            )
         )
     }
 

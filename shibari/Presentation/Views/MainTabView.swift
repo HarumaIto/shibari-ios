@@ -4,14 +4,22 @@ struct MainTabView: View {
     let currentUserId: String
     let groupId: String
     @State private var postQuestId: String? = nil
+    @State private var timelineViewModel: TimelineViewModel
     
     var onLogoutRequest: () -> Void
     @EnvironmentObject var diContainer: AppDIContainer
+
+    init(currentUserId: String, groupId: String, timelineViewModel: TimelineViewModel, onLogoutRequest: @escaping () -> Void) {
+        self.currentUserId = currentUserId
+        self.groupId = groupId
+        self.onLogoutRequest = onLogoutRequest
+        self._timelineViewModel = State(initialValue: timelineViewModel)
+    }
         
     var body: some View {
         TabView {
             NavigationStack {
-                diContainer.makeTimelineView(currentUserId: currentUserId, groupId: groupId)
+                TimelineView(viewModel: timelineViewModel)
             }
             .tabItem {
                 Image(systemName: "list.bullet")
