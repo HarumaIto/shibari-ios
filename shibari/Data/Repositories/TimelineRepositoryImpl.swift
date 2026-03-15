@@ -72,22 +72,10 @@ class TimelineRepositoryImpl: TimelineRepository {
     
     func votePost(postId: String, userId: String, voteType: VoteType) async throws {
         let postRef = db.collection("timelines").document(postId)
-        
-        // Firestoreのトランザクションを使って、カウントと投票履歴を安全に更新
-        _ = try await db.runTransaction({ (transaction, errorPointer) -> Any? in
-            do {
-                let document = try transaction.getDocument(postRef)
-                guard var dto = try? document.data(as: TimelinePostDto.self) else { return nil }
-                
-                // 投票を記録
-                dto.votes[userId] = voteType.rawValue
-                
-                try transaction.setData(from: dto, forDocument: postRef)
-            } catch let fetchError as NSError {
-                errorPointer?.pointee = fetchError
-            }
-            return nil
-        })
+
+        try await postRef.updateData([
+            "votes.\(userId)": voteType.rawValue
+        ])
     }
     
     // コメントをリアルタイム取得するストリーム（Flowの代わり）
