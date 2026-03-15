@@ -134,7 +134,7 @@ struct TimelinePostCard: View {
                     Button(action: { onVote(.REJECT) }) {
                         HStack {
                             Image(systemName: "xmark.shield.fill")
-                            Text("否認")
+                            Text("否認 (\(post.rejectCount))")
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 12)

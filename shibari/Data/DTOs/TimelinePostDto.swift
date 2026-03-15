@@ -15,6 +15,7 @@ struct TimelinePostDto: Codable {
     var comment: String
     
     var approvalCount: Int
+    var rejectCount: Int?
     var votes: [String: String]
     var status: String
     
@@ -36,6 +37,7 @@ struct TimelinePostDto: Codable {
             mediaType: MediaType(rawValue: mediaType) ?? .image,
             comment: comment,
             approvalCount: approvalCount,
+            rejectCount: rejectCount ?? 0,
             votes: votes.compactMapValues { VoteType(rawValue: $0) },
             status: PostStatus(rawValue: status) ?? .pending,
             commentCount: commentCount ?? 0,
@@ -59,6 +61,7 @@ struct TimelinePostDto: Codable {
             mediaType: domain.mediaType.rawValue,
             comment: domain.comment,
             approvalCount: domain.approvalCount,
+            rejectCount: domain.rejectCount,
             // Dictionaryの中のEnumも一括で変換
             votes: domain.votes.mapValues { $0.rawValue },
             status: domain.status.rawValue,

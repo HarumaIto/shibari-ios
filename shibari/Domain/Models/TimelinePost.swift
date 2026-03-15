@@ -11,6 +11,7 @@ struct TimelinePost: Identifiable, Equatable {
     let mediaType: MediaType
     let comment: String
     var approvalCount: Int = 0
+    var rejectCount: Int = 0
     var votes: [String: VoteType] = [:]
     let status: PostStatus
     var commentCount: Int = 0
