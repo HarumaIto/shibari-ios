@@ -72,7 +72,7 @@ struct TimelinePostCard: View {
             .padding(.horizontal, 16)
             
             // --- 2. 証拠画像 ---
-            VStack(alignment: .leading, spacing: 0) {
+            VStack(alignment: .leading, spacing: 16) {
                 if let mediaUrl = URL(string: post.mediaUrl) {
                     SwiftUI.Group {
                         if post.mediaType == .video {
@@ -90,7 +90,7 @@ struct TimelinePostCard: View {
                     Text(post.comment)
                         .foregroundColor(.textPrimary)
                         .font(.body)
-                        .padding(16)
+                        .padding(.horizontal, 16)
                 }
             }
             
