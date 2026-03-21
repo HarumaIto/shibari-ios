@@ -1,6 +1,6 @@
 import SwiftUI
 
-enum JudgResult: String, Codable {
+enum JudgmentResult: String, Codable {
     case approval = "APPROVE"
     case reject = "REJECT"
     case unknown = "UNKNOWN"

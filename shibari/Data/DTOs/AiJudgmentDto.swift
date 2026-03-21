@@ -9,7 +9,7 @@ struct AiJudgmentDto: Codable {
     
     func toDomain() -> AiJudgment {
         AiJudgment(
-            result: JudgResult(rawValue: result) ?? .unknown,
+            result: JudgmentResult(rawValue: result) ?? .unknown,
             reason: reason,
             judgedAt: judgedAt?.dateValue() ?? Date()
         )
