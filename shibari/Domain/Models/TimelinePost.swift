@@ -7,6 +7,7 @@ struct TimelinePost: Identifiable, Equatable {
     let groupId: String
     let author: AuthorSnapshot
     let quest: QuestSnapshot
+    var aiJudgment: AiJudgment? = nil
     var mediaUrl: String  = ""
     let mediaType: MediaType
     let comment: String
