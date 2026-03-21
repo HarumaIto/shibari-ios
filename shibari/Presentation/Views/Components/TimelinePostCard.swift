@@ -15,7 +15,7 @@ struct TimelinePostCard: View {
     @EnvironmentObject var diContainer: AppDIContainer
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
+        VStack(alignment: .leading, spacing: 16) {
             // --- 1. ヘッダー部（投稿者情報とメニュー） ---
             HStack {
                 if let photoUrl = post.author.photoUrl, let url = URL(string: photoUrl) {
@@ -69,10 +69,10 @@ struct TimelinePostCard: View {
                     }
                 }
             }
-            .padding(16)
+            .padding(.horizontal, 16)
             
             // --- 2. 証拠画像 ---
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 0) {
                 if let mediaUrl = URL(string: post.mediaUrl) {
                     SwiftUI.Group {
                         if post.mediaType == .video {
@@ -90,8 +90,8 @@ struct TimelinePostCard: View {
                     Text(post.comment)
                         .foregroundColor(.textPrimary)
                         .font(.body)
-                        .padding(16)
-
+                        .padding(.top, 8)
+                        .padding(.horizontal, 16)
                 }
             }
             
@@ -200,8 +200,9 @@ struct TimelinePostCard: View {
                     }
                 }
             }
-            .padding(16)
+            .padding(.horizontal, 16)
         }
+        .padding(.vertical, 16)
         .background(Color.slateSurface)
         .cornerRadius(16)
         .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 4)
