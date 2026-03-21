@@ -58,6 +58,7 @@ struct TimelinePostDto: Codable {
             groupId: domain.groupId,
             author: AuthorSnapshotDto.fromDomain(domain.author),
             quest: QuestSnapshotDto.fromDomain(domain.quest),
+            aiJudgment: nil,
             mediaUrl: domain.mediaUrl,
             // EnumからString(rawValue)への変換
             mediaType: domain.mediaType.rawValue,
