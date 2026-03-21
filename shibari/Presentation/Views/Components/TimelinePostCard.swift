@@ -90,8 +90,7 @@ struct TimelinePostCard: View {
                     Text(post.comment)
                         .foregroundColor(.textPrimary)
                         .font(.body)
-                        .padding(.top, 8)
-                        .padding(.horizontal, 16)
+                        .padding(16)
                 }
             }
             
