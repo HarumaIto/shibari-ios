@@ -72,27 +72,65 @@ struct TimelinePostCard: View {
             .padding(16)
             
             // --- 2. 証拠画像 ---
-            if let mediaUrl = URL(string: post.mediaUrl) {
-                SwiftUI.Group {
-                    if post.mediaType == .video {
-                        FeedVideoPlayer(url: mediaUrl)
-                    } else {
-                        FeedImageView(url: mediaUrl, contentMode: .fit)
+            VStack(alignment: .leading) {
+                if let mediaUrl = URL(string: post.mediaUrl) {
+                    SwiftUI.Group {
+                        if post.mediaType == .video {
+                            FeedVideoPlayer(url: mediaUrl)
+                        } else {
+                            FeedImageView(url: mediaUrl, contentMode: .fit)
+                        }
                     }
+                    .frame(maxWidth: .infinity, maxHeight: 500)
+                    .background(Color.slateSurfaceVariant)
+                    .clipped()
                 }
-                .frame(maxWidth: .infinity, maxHeight: 500)
-                .background(Color.slateSurfaceVariant)
-                .clipped()
-            }
-            
-            // --- 3. コメントと投票エリア ---
-            VStack(alignment: .leading, spacing: 16) {
+                
                 if !post.comment.isEmpty {
                     Text(post.comment)
                         .foregroundColor(.textPrimary)
                         .font(.body)
+                        .padding(16)
+
                 }
-                
+            }
+            
+            if let aiJudgment = post.aiJudgment {
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack {
+                        Image(systemName: "sparkles.tv")
+                            .font(.subheadline)
+                        
+                        Text("AI判定: \(aiJudgment.result.displayName)")
+                            .font(.subheadline)
+                            .fontWeight(.bold)
+                        
+                        Spacer()
+                        
+                        Text(aiJudgment.judgedAt.formatted(date: .omitted, time: .shortened))
+                            .font(.caption2)
+                            .foregroundColor(.textSecondary)
+                    }
+                    .foregroundColor(aiJudgment.result.color)
+                    
+                    Text(aiJudgment.reason)
+                        .font(.caption)
+                        .foregroundColor(.textPrimary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(aiJudgment.result.color.opacity(0.1))
+                .cornerRadius(8)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(aiJudgment.result.color.opacity(0.3), lineWidth: 1)
+                )
+                .padding(.horizontal, 16)
+            }
+            
+            // --- 3. コメントと投票エリア ---
+            VStack(alignment: .leading, spacing: 16) {
                 if !post.latestComments.isEmpty {
                     VStack(alignment: .leading, spacing: 4) {
                         ForEach(post.latestComments.reversed(), id: \.self) { commentText in
