@@ -9,6 +9,7 @@ struct TimelinePostDto: Codable {
     
     var author: AuthorSnapshotDto
     var quest: QuestSnapshotDto
+    var aiJudgment: AiJudgmentDto?
     
     var mediaUrl: String
     var mediaType: String
@@ -32,6 +33,7 @@ struct TimelinePostDto: Codable {
             groupId: groupId,
             author: author.toDomain(),
             quest: quest.toDomain(),
+            aiJudgment: aiJudgment?.toDomain(),
             mediaUrl: mediaUrl,
             // Enumの変換。失敗時は安全なデフォルト値を設定
             mediaType: MediaType(rawValue: mediaType) ?? .image,
