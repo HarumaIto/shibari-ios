@@ -15,7 +15,7 @@ struct TimelinePostCard: View {
     @EnvironmentObject var diContainer: AppDIContainer
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
+        VStack(alignment: .leading, spacing: 16) {
             // --- 1. ヘッダー部（投稿者情報とメニュー） ---
             HStack {
                 if let photoUrl = post.author.photoUrl, let url = URL(string: photoUrl) {
@@ -69,30 +69,67 @@ struct TimelinePostCard: View {
                     }
                 }
             }
-            .padding(16)
+            .padding(.horizontal, 16)
             
             // --- 2. 証拠画像 ---
-            if let mediaUrl = URL(string: post.mediaUrl) {
-                SwiftUI.Group {
-                    if post.mediaType == .video {
-                        FeedVideoPlayer(url: mediaUrl)
-                    } else {
-                        FeedImageView(url: mediaUrl, contentMode: .fit)
-                    }
-                }
-                .frame(maxWidth: .infinity, maxHeight: 500)
-                .background(Color.slateSurfaceVariant)
-                .clipped()
-            }
-            
-            // --- 3. コメントと投票エリア ---
             VStack(alignment: .leading, spacing: 16) {
+                if let mediaUrl = URL(string: post.mediaUrl) {
+                    SwiftUI.Group {
+                        if post.mediaType == .video {
+                            FeedVideoPlayer(url: mediaUrl)
+                        } else {
+                            FeedImageView(url: mediaUrl, contentMode: .fit)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: 500)
+                    .background(Color.slateSurfaceVariant)
+                    .clipped()
+                }
+                
                 if !post.comment.isEmpty {
                     Text(post.comment)
                         .foregroundColor(.textPrimary)
                         .font(.body)
+                        .padding(.horizontal, 16)
                 }
-                
+            }
+            
+            if let aiJudgment = post.aiJudgment {
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack {
+                        Image(systemName: "sparkles.tv")
+                            .font(.subheadline)
+                        
+                        Text("AI判定: \(aiJudgment.result.displayName)")
+                            .font(.subheadline)
+                            .fontWeight(.bold)
+                        
+                        Spacer()
+                        
+                        Text(aiJudgment.judgedAt.formatted(date: .omitted, time: .shortened))
+                            .font(.caption2)
+                            .foregroundColor(.textSecondary)
+                    }
+                    .foregroundColor(aiJudgment.result.color)
+                    
+                    Text(aiJudgment.reason)
+                        .font(.caption)
+                        .foregroundColor(.textPrimary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(aiJudgment.result.color.opacity(0.1))
+                .cornerRadius(8)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(aiJudgment.result.color.opacity(0.3), lineWidth: 1)
+                )
+                .padding(.horizontal, 16)
+            }
+            
+            // --- 3. コメントと投票エリア ---
+            VStack(alignment: .leading, spacing: 16) {
                 if !post.latestComments.isEmpty {
                     VStack(alignment: .leading, spacing: 4) {
                         ForEach(post.latestComments.reversed(), id: \.self) { commentText in
@@ -162,8 +199,9 @@ struct TimelinePostCard: View {
                     }
                 }
             }
-            .padding(16)
+            .padding(.horizontal, 16)
         }
+        .padding(.vertical, 16)
         .background(Color.slateSurface)
         .cornerRadius(16)
         .shadow(color: Color.black.opacity(0.2), radius: 8, x: 0, y: 4)
